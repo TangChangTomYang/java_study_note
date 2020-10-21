@@ -2680,14 +2680,25 @@ public interface JiaJiaoable{
 其实在很多编程语言里面, 都是有多态的. 
 
 - 什么是多态?
+
   - 具有多种形态
   - 同一操作用于不同的对象, 产生不同的执行效果
+
 - 多态的体现
+
   - 父类(接口) 类型指向子类实例对象
   - 调用子类重写的方法
+
 - JVM会根据引用变量指向的具体对象来调用对应的方法
+
   - 这个行为叫做: `虚方法调用(virtual method invocation)`
   - 类似C++中的虚函数调用
+
+  
+
+**记住一个多态的结论:**
+
+在java开发中, 多态是针对实例对象的
 
 
 
@@ -2762,19 +2773,1749 @@ public interface JiaJiaoable{
   }
   ```
 
-## 4、静态方法, 多态应用
+## 4、静态方法访问细节(重点!)
+
+在java中访问静态方法有个和其他语言不通的奇葩的特点:
+
+在java中访问静态方法时, 会直接从 `.xxx方法()` 的`.` 左边的引用类型开始搜索定调用, 比如:
+
+> `aaa.test()` 会从 `aaa` 的引用类型开始查找, 与 `aaa` 指向的真实对象类型无关, 左边是什么类型就从什么类型开始找
+
+示例如下:
+
+```
+package com;
+
+public class Animal {
+
+	public static void speak() {
+		System.out.println("animal speak");
+	} 
+}
+
+class Dog extends Animal{
+	public static void speak() {
+		System.out.println("Dog speak");
+	}
+}
+
+
+public static void main(String[] args) {
+		Animal.speak();		// "animal speak"
+		Dog.speak();			// "Dog speak"
+		
+		
+		Animal animal = new Animal();
+		animal.speak();		// "animal speak"
+		
+		Animal dogAnimal = new Dog();
+		dogAnimal.speak(); // "animal speak"
+}
+```
+
+> 静态方法调用的结论:
+>
+> 说白了
+
+
+
+## 5、成员变量的访问细节(重点!)
+
+- 直接访问成员变量访问细节
+
+  ```
+  public class Person {
+  
+  	public  int age = 1;
+  	public int getPAge() {
+  		return age;
+  	}
+  	
+  }
+  
+  class Student extends Person{
+  	public int age = 2;
+  	public int getSAge() {
+  		return age;
+  	}
+  }
+  
+  
+  public static void main(String[] args) {
+  		
+  		// 奇怪的结果
+  		Student student = new Student(); 
+  		System.out.println(student.age);  		// 2	
+  		System.out.println(student.getSAge());	// 2
+  		System.out.println(student.getPAge());  // 1
+  		
+  		
+  		Person stuPerson = new Student();
+  		System.out.println(stuPerson.age);		// 1
+  		// System.out.println(stuPerson.getSAge()); 直接报错, 不让调用 getSAge()
+  		System.out.println(stuPerson.getPAge()); // 1
+  		
+  }
+  ```
+
+  
+
+**结论:**
+
+在java中通过对象直接访问成员变量时, 成员变量的查找只和 变量左边引用变量的类型相关, 与引用执行的真实对象类型无关, 这一点和java中静态方法(类方法) 的 访问上的查找顺序结论一致的**(只与引用变量类型相关, 与应用真实类型无关)**
+
+
+
+- 成员变量访问, 与多态的细节
+
+  ```
+  public class Person {
+  
+  	public  int age = 1;
+  	public int getPAge() {
+  		return age;
+  	}
+  	
+  }
+  
+  
+  class Student extends Person{
+  	public int age = 2;
+  	public int getPAge() {
+  		return age;
+  	}
+  	public int getSAge() {
+  		return age;
+  	}
+  }
+  
+  public static void main(String[] args) {
+  		
+  		
+  		Student stu = new Student();
+  		// 因为 .age 成员变量左边的引用变量stu 是Student 类型的
+  		// 因此 访问的是Student类中的成员变量 age=2
+  		System.out.println(stu.age);
+  		
+  		// 因为stu是实例对象, 实例变量访问实例方法是有多态特点的
+  		// 因为Student 类中重写了 getPAge(), 因此此处访问的是Student 中的 getPAge()方法 = 2
+  		System.err.println(stu.getPAge());
+  		
+  		// 结果为2, 这一段方法调用没有异议
+  		System.out.println(stu.getSAge());
+  	}
+  ```
+
+  > 根据**静态方法访问细节** 和 **成员变量访问细节** 我们有得出一个结论, 在java中不推荐我们直接访问成员变量
+  >
+  > 所以java开法中, 一般都会把成员变量定义为 `private` 类型的变量
+
+
+
+
+- 再举个例子
+
+  ```
+  class Animal{
+  	int age = 1;
+  	
+  	int getAge() {
+  		System.out.println("Animal get age");
+  		return age;
+  	}
+  }
+  
+  class Person extends Animal{
+  	int age  = 2;
+  	int getAge() {
+  		System.out.println("Person get age");
+  		return age;
+  	}
+  }
+  
+  class Student extends Person{
+  	int age = 3;
+  	int getAge() {
+  		System.out.println("Student get age");
+  		return age;
+  	}
+  }
+  
+  public static void main(String[] args) {
+  		Animal s = new Student();
+  		
+  		System.out.println(s.age);
+  		System.out.println(((Person)s).age);
+  		System.out.println(((Student)s).age);
+  		
+  		System.out.println("-------------");
+  		
+  		System.out.println(((Animal)s).getAge());
+  		System.out.println(((Person)s).getAge());
+  		System.out.println(((Student)s).getAge());
+  		
+  	}
+  	
+  // 打印结果
+  1
+  2
+  3
+  -------------
+  Student get age
+  3
+  Student get age
+  3
+  Student get age
+  3
+  
+  ```
+
+  > 从这个示例, 也再次证明了在java中,多态是针对实例方法的调用的
+  >
+  > 如果我们直接通过实例来访问成员变量时可能会出现意料之外的结果, 因此我们还是强烈建议, java中的成员变量应当定义为 private 的, 然后暴露出get 和 set方法供外部访问, 这样才能达到多态的效果
+
+
+
+# 十二、instanceof 
+
+
+
+## 1、instanceof 的介绍
+
+- 可以通过**instanceof** 判断某个类型是否属于某种类型
+
+  > 即, instanceof 可以用来判断左边的实例是不是属于右边的类型
+  >
+  > 与Objective-c 中的 isKingofClass() 方法差不多
+
+  ```
+  // 接口
+  public interface Runnable {}
+  
+  public class Person{}
+  
+  class Student extends Person implements Runnable{}
+  
+  
+  public static void main(String[] args) {
+  		
+  		Person pson = new Person();
+  		System.out.println(pson instanceof Person);  		// true 
+  		System.out.println(pson instanceof Student); 		// false 
+  		System.out.println(pson instanceof Runnable); 	// false
+  		
+  		Person stu = new Student();
+  		System.out.println(stu instanceof Person);  	// true
+  		System.out.println(stu instanceof Student); 	// true
+  		System.out.println(stu instanceof Runnable);	// true
+  }
+  ```
+
+  
+
+## 2、instanceof 的应用
+
+一般我们在开发中经常会使用到面向对象的多态特性(父类型引用接收子类型的实例对象), 在多态的应用过程中很多地方会结合 `instanceof` 使用, 下面就是个典型的应用
+
+```
+public class Test {
+
+	public static void main(String[] args) {
+		speak(new Dog());
+		speak(new Cat());
+	}
+	
+	// 根据实例对象的真实类型, 做对应的事情
+	static void speak(Animal animal) {
+		
+		if (animal instanceof Dog) {
+			((Dog)animal).wangwang();
+		}
+		else if(animal instanceof Cat) {
+			((Cat)animal).miaomiao();
+		}
+	}
+}
+
+class Animal{}
+
+class Dog extends Animal{
+	public void wangwang() {
+		System.out.println("dog wangwang");
+	}
+}
+
+class Cat extends Animal{
+	public void miaomiao() {
+		System.out.println("cat miaomiao");
+	}
+}
+```
+
+
+
+# 十三、匿名类(Anonymous class)
+
+## 1、匿名类的简单使用
+
+当**接口、抽象类** 的实现类, 在整个项目中只用过一次, 可以考虑使用匿名类
+
+或者我们可以说在java中, 我们可以通过**接口、抽象类** 来创建匿名类
+
+>  其实, 在java中匿名类通常是 接口的一种高级用法, java中使用匿名类来实现接口的功能比我们单独定义一个类来实现接口中的方法更灵活
+>
+> 这一点, 后面会体会到
+
+- 使用接口定义一个匿名类
+
+  ```
+  // 1. 定义 Runnable 接口
+  public interface Runnable {
+  	void run();
+  }
+  
+  
+  public static void main(String[] args) {
+  		
+  		// 2. 使用匿名类技术, 创建一个匿名类对象的实例
+  		Runnable person = new Runnable() { // 这个就是java中匿名类
+  			@Override
+  			public void run() {
+  				System.out.println("person runnable run");
+  			}
+  		};
+  		
+  		// 3. 调用匿名类对象的接口方法
+  		person.run();
+  	}
+  ```
+
+- 当然, 除了可以使用接口创建一个匿名类, 我们也可以利用一个抽象方法创建一个匿名类
+
+  ```
+  // 1. 定义一个抽象类
+  public abstract class Animal {
+  	public abstract void run();
+  }
+  
+  
+  public class Test {
+  	public static void main(String[] args) {
+  		// 2. 使用 抽象类创建一个匿名类对象
+  		Animal person = new Animal() {
+  			@Override
+  			public void run() {
+  				System.out.println("animal person run");
+  			}
+  		};
+  		
+  		// 3. 调用匿名类的使用方法
+  		person.run();
+  	}
+  }
+  ```
+
+  
+
+- 使用匿名类的好处
+
+  - 实现类不必实现创建好, 我们可以在代码的实现处, 根据需要创建我们的匿名类
+
+  - 可以少些实现类, 代码更精简
+
+  - 其实使用匿名类还有个好处, 就是在匿名类中实现的方法可以很灵活, 根据情况的变化而变化
+
+    如果我们不使用匿名类的话, 那么实现类中的接口方法需要实现在文件中写好, 不灵活
+
+  - 还有就是我们一般会在java中使用匿名类 完成一个像Objective-c 中block 一样的 回调功能, 后面我们会举例说明
+
+    > 即, 在Objective-c 中我们使用block 做回调(将方法的参数定义为block类型), 而在java中我们可以使用匿名类做回调(将方法的参数定义为指定的 接口类型)
+
+- 当然, 在java中匿名类还可以这样写
+
+  ```
+  public abstract class Animal {
+  	public abstract void run();
+  }
+  
+  public class Test {
+  	public static void main(String[] args) {
+  	
+  		// 直接创建匿名类对象, 并调用它的实例方法
+  		new Animal() {
+  			@Override
+  			public void run() {
+  				System.out.println("animal person run");
+  			}
+  		}.run();
+  	}
+  }
+  ```
+
+
+
+## 2、匿名类的使用注意事项
+
+1. 匿名类中不能定义除编译时常量以外的static成员
+
+   即, 匿名类中可以定义普通的成员(成员方法, 成员变量(非静态), 可以定义 `static final` 常量, 不能定义static方法, 不能定义普通static 变量
+
+   ```
+   // 一句话, 
+   Animal person = new Animal() {
+     private int age;
+     public static final double height = 10;
+     // public static int count = 1;  错误不允许定义
+     // public static void counter() {} 错误不能定义
+   
+     @Override
+     public void run() {
+       System.out.println("animal person run");
+     }
+   }; 
+   person.run();
+   ```
+
+   
+
+2. 在匿名类中只能访问 `final` 或者 `有效 final` 的局部变量
+
+3. 匿名类可以直接访问外部类中的所有成员呢(即使被声明为 `private`)
+
+4. 匿名类只有在实例相关的代码块中使用, 才能访问外部类中的实例成员(实例变量, 实例方法)
+
+5. 匿名类是不能定义构造方法的, 但是可以有初始代码化块
+
+
+
+## 3、匿名类的常见用途
+
+匿名类的常见用途:
+
+- 代码传递
+- 过滤器
+- 回调
+
+
+
+### 1、匿名类实现(代码传递)
+
+**示例1:**  匿名类实现  回调 的功能 (类似于Objective-c 中的block 作用)
+
+```
+package com;
+
+public class YRTimer {
+
+	// 定义一个接口
+	public interface Block{ 
+		void execute();
+	}
+	
+	// 定义一个方法, 这个方法会在合适的时候 回调用 接口里面指定的方法
+	// 接口里面的方法就有点像回调方法一样, 在合适的时候被调用
+	public static void test(Block block) { 
+		if (block == null) {
+			return;
+		}
+		
+		long begin = System.currentTimeMillis();
+		block.execute(); 
+		long end = System.currentTimeMillis();
+		double duration = (end - begin) / 1000.0;
+		System.out.println("耗时: " + duration );
+	}
+}
+
+
+package com;
+import com.YRTimer.Block;
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		// 使用 匿名类完成方法的回调
+		YRTimer.test( new Block() { 
+			@Override
+			public void execute() {
+				longTimeOperate();  // 执行耗时的操作 (代码传递, 将需要执行的代码写在匿名类的方法实现里面即可)
+			}
+		});
+		
+	}
+	 
+	// 耗时操作
+	static void longTimeOperate() {
+		for (int i=0; i<100; i++) {
+			System.out.println("--index: " + i);
+		}
+	}
+}
+
+
+// 说明 上面的匿名类也可以这样来创建, 这样就不用导包了
+YRTimer.test( new YRTimer.Block() { 
+			@Override
+			public void execute() {
+				longTimeOperate();  // 执行耗时的操作
+			}
+		});
+```
+
+
+
+### 2、匿名类实现 回调功能
+
+其实,匿名类实现回调功能和匿名类实现代码传递是一个意思
+
+```
+package com;
+public class Network {
+	
+	public interface Block{
+		void success(Object response);
+		void  fail();
+	}
+	
+	public static void get(String url, Block callback) {
+	
+		// 1. 根据url 发送一个网络请求 (开启一条子线程)
+		// 2. 根据请求结果, 执行回调
+		boolean result = url == "https://baidu.com"; 
+		if (result == true) {
+			callback.success("网络请求 执行成功");
+		}
+		else {
+			callback.fail();
+		}
+	}
+}
+
+
+package com;
+import com.Network.Block;
+public class Test {
+	public static void main(String[] args) {
+		
+		Network.get("https://baidu.com", new Block() {
+			
+			@Override
+			public void success(Object response) { // 当网络请求成功就会回调这个方法
+				System.out.println(response);
+			}
+			
+			@Override
+			public void fail() { // 当网络请求失败就会回调这个方法
+				System.out.println(" 执行网络请求失败");
+			}
+		});
+	}
+	
+}
+```
+
+
+
+### 3、匿名类实现 过滤器
+
+使用匿名类实现过滤器, 其实原理就和有些编程语言中的高阶函数一样
+
+```
+package com;
+public class Files {
+
+	// 封装一个过滤器接口, 用来过滤文件
+	public interface Filter{
+		boolean accept(String fileName);
+	}
+	
+	// 获取指定文件夹下 满足条件的文件
+	public static String[] getAllFileNames(String dir, Filter filter) {
+		
+		// 0. 存储满足条件的文件
+		String[] acceptFileNames = {};
+		
+		// 1. 获取指定文件夹下 满足条件的所有文件名
+		String[] allFileNames = {};
+		
+		// 2. 使用给定的过滤器, 对文件进行过滤
+		for(String fileName : allFileNames) {
+			if (filter.accept(fileName) == true) {
+				// 3. 将满足条件的文件 保存起来
+			}
+		}
+		return acceptFileNames;
+	}
+}
+
+// 导入 过滤器接口
+import com.Files.Filter;
+public void getfilenames() {
+		String[] mp3Files = Files.getAllFileNames("c:/abc", new Filter() {
+			// 获取所有 mp3 的文件
+			@Override
+			public boolean accept(String fileName) {
+				if (fileName.contains(".mp3") == true) {
+					return true;
+				}
+				return false;
+			}
+		});
+		System.out.println(mp3Files);
+	}
+```
+
+
+
+### 4、排序
+
+可以使用JDK 自带的 `java.util.Arrays` 类 对数组进行排序
+
+```
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+	public static void main(String[] args) {
+		Integer[] array = {33, 22,11,77,66,99};
+		Arrays.sort(array, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return o1 - o2;
+			}
+		});
+		System.out.println(Arrays.toString(array));
+		// 结果: [11, 22, 33, 66, 77, 99]
+	}
+}
+
+
+// 其实, 我们也可以使用JDK中提供的
+Integer[] array = {33, 22,11,77,66,99};
+Arrays.sort(array); 
+System.out.println(Arrays.toString(array));
+// 结果: [11, 22, 33, 66, 77, 99]
+```
+
+
+
+# 十四、Lambda Expression
+
+## 1、函数式接口介绍
+
+- Lambda 表达式是java8开始才有的语法
+
+- 函数式接口(function interface) : 只包含一个抽象方法的接口
+
+  > 简单的说, 在java中我们把只包含一个抽象方法的接口称之为函数式接口, 即函数式接口中只有一个抽象方法
+
+  ```
+  // 下面这个接口我们称之为 函数式接口, 因为接口中只包含一个抽象方法
+  public interface Block{
+  	void callback();
+  }
+  
+  // 下面的接口不是函数式接口, 因为包含多个抽象方法
+  public interface Runnable{
+  	void walk();
+  	void run();
+  }
+  ```
+
+  - 在java开发中, 如果我们定义的是函数式接口, 一般我们会建议添加上`@FunctionalInterface` 注解, 它表示是一个函数式接口
+
+    ```
+    @FunctionalInterface
+    public interface Block{
+    	void callback();
+    }
+    ```
+
+当我们使用匿名类实现的是函数式接口时, 可以使用**Lambda表达式进行简化** 
+
+
+
+## 2、Lambda 表达式介绍
+
+1. Lambda 表达式比较正规的定义格式
+
+   ```
+   (参数列表) -> {
+   	return xxx;
+   }
+   ```
+
+2. 前面我们已经介绍过了, 当我们在使用匿名类实现函数式接口时, 可以使用**lambda 表达式简化**
+
+   > 换句话说, 如果我们使用只有一个 `抽象方法` 的接口, 创建匿名类实例时, 这时我们就可以使用 `Lambda表达式` 简化 `匿名类实例了`
+   >
+   > 示例如下:
+
+   
+
+### 1、lambda 表达式简化 匿名类的示例1
+
+- 使用**匿名类的写法** 
+
+  ```
+  package com;
+  public class YRTimer {
+  
+  	@FunctionalInterface  // 函数式接口
+  	public interface Block{ 
+  		void execute();
+  	}
+  	
+  	// 测试代码执行的时长
+  	public static void test(Block block) { 
+  		if (block == null) {
+  			return;
+  		}
+  		long begin = System.currentTimeMillis();
+  		block.execute(); 
+  		long end = System.currentTimeMillis();
+  		double duration = (end - begin) / 1000.0;
+  		System.out.println("耗时: " + duration );
+  	}
+  }
+  
+  import com;
+  // 导入函数式接口
+  import com.YRTimer.Block;
+  static void test(){
+    YRTimer.test(new Block(){
+      void execute(){
+        for (int i = 0; i < 100; i ++) {
+  				System.out.println("耗时操作 " + );
+  			}
+      }
+    })
+  }
+  ```
+
+- 使用**lambda 表达式简化**
+
+  ```
+  static void test(){
+    YRTimer.test(() ->{ 
+  			for (int i = 0; i < 100; i ++) {
+  				System.out.println("耗时操作 " + i);
+  			}
+  	});
+  }
+  ```
+
+  > 可以发现, 使用函数式接口, 代码更简洁, 还有个好处, 不用导入函数式接口的包
+
+
+
+### 2、lambda 表示是简化匿名类的示例2
+
+- 使用 匿名类的写法
+
+  ```
+  package com;
+  public class Files {
+  	@FunctionalInterface  // 定义函数式接口
+  	public interface Filter{
+  		boolean accept(String fileName);
+  	}
+  	
+  	// 获取指定文件夹下 满足条件的文件
+  	public static String[] getAllFileNames(String dir, Filter filter) {
+  		
+  		// 0. 存储满足条件的文件
+  		String[] acceptFileNames = {};
+  		// 1. 获取指定文件夹下 满足条件的所有文件名
+  		String[] allFileNames = {};
+  		// 2. 使用给定的过滤器, 对文件进行过滤
+  		for(String fileName : allFileNames) {
+  			if (filter.accept(fileName) == true) {
+  				// 3. 将满足条件的文件 保存起来
+  			}
+  		}
+  		return acceptFileNames;
+  	}
+  }
+  
+  import com.Files.Filter;
+  public static void main(String[] args) {
+  		// 获取c 盘下的所有 mp3 文件
+  		Files.getAllFileNames("C:", new  Filter() {
+  			@Override
+  			public boolean accept(String fileName) {
+  				if (fileName.contains(".mp3") == true) {
+  					return true;
+  				}
+  				return false;
+  			}
+  		});
+  	}
+  ```
+
+  - 使用 `lambda` 表达式简化
+
+    > lambda 表达式如果需要返回值时, 直接return 即可, 编译器支持类型推到
+
+    ```
+    public static void main(String[] args) {
+      // 获取c 盘下的所有 mp3 文件
+      // lambda 表达式如果有返回值, 返回值类型可以省略, 编译器会自动类型推到
+      Files.getAllFileNames("C:", (String fileName) -> {
+        if (fileName.contains(".pm3") == true) {
+        	return true;
+        }
+        return true;
+      });
+    }
+    ```
+
+
+
+## 3、lambda 表达式的精简
+
+1. lambda 表达式的参数列表中的参数类型可以省略
+2. 当lambda表达式只有一个参数时, 参数列表的小括号`()` 可以省略
+3. 当参数列表没有参数时, 小括号`()` 不能省略
+4. 当lambda表达式只有一条语句时, lambda表达式的 花括号`{}` 分号`;` `return` 都可以省略
+
+
+
+### 1、省略lambda 表达式, 参数类型
+
+- lambda 表达式的参数列表中的参数类型可以不写, 编译器可以自动推到
+
+  ```
+  // 精简前
+  Integer[] arr = {33, 22, 22, 77, 66, 99};
+  Arrays.sort(arr, (Integer o1, Integer o2)->{
+  	return o1 - o2;
+  })
+  
+  // 精简后
+  Integer[] arr = {33, 22, 22, 77, 66, 99};
+  Arrays.sort(arr, (o1, o2)->{
+  	return o1 - o2;
+  })
+  ```
+
+### 2、省略 lambda表达式 参数的 ()
+
+- 当 lambda 表达式的参数列表中只有一个参数时, 可以省略参数列表的小括号`()`
+
+  > 下面我们以获取指定目录下的指定类型的文件代码为例说明:
+
+  ```
+  // 精简前
+  Files.getAllFiles("C:", (String fileName)->{
+  	if(fileNames.contains(".mp3")){
+  		return true;
+  	}
+  	return false;
+  });
+  
+  // 精简1, 省略lambda 表达式参数列表的参数类型
+  Files.getAllFiles("C:", (fileName)->{
+  	if(fileNames.contains(".mp3")){
+  		return true;
+  	}
+  	return false;
+  });
+  
+  // 精简2, 如果lambda 表达式只有一个参数时, 可以省略参数的 ()
+  Files.getAllFiles("C:", fileName -> {
+  	if(fileNames.contains(".mp3")){
+  		return true;
+  	}
+  	return false;
+  });
+  ```
+
+- 但是如果 lambda 表达式是不需要参数的, 那么 `()` 是不能省略的
+
+  ```
+  Timer.Test(()->{   // 注意此时, lambda 表达式 -> 左侧的 () 是不能省略的
+  	// 被测代码
+  	for(int i=0; i<10; i++){
+  		System.out.println("耗时操作: " + i);
+  	}
+  })
+  ```
+
+### 3 、当lambda表示式只有一条语句时, 可以省略 {}, 分号 return
+
+```
+Integer arr = {22, 55, 66, 11, 33 ,99};
+
+// 精简前
+Arrays.sort(arr, (o1, o2)->{
+	return o1 - o2;
+});
+
+// 精简后
+Arrays.sort(arr, (o1, o2) -> o1 - o2);
+```
+
+
+
+## 4、lambda表达式的使用注意
+
+- lambda 只能访问`final` 或者 有效`final` 的局部变量 
+
+  > 这一点, 与java中定义的内部类(非静态嵌套类相似)  
+
+- **lambda 没有引入新的作用域** !!! 
+
+  ```
+  package com;
+  public interface Testable{
+  	void test(int v);
+  }
+  
+  package com;
+  public class OuterClass {
+  	private int age = 1;
+  	
+  	public static void main(String[] args) {
+  		new  OuterClass().new  InnerClass().inner();;
+  	}
+  	
+  	public class InnerClass{
+  		private int age = 2;
+  		void inner() {
+  			// lambda 表达式 没有引入新的作用域
+  			Testable t = v -> {
+  				System.out.println(v);						// 10
+  				System.out.println(age);					// 2
+  				System.out.println(this.age);				// 2
+  				System.out.println(InnerClass.this.age);	// 2
+  				System.out.println(OuterClass.this.age); 	// 1
+  			};
+  			t.test(10);
+  		}
+  	}
+  }
+  
+  
+  // 所谓lambda 表达式没有引入新的作用域, 你可以理解为, 上面的代码可以写成下面的样子
+  // 注意, 只是可以理解为, 并不是就是真正的可以写成这样
+  public class OuterClass {
+  	private int age = 1;
+  	
+  	public static void main(String[] args) {
+  		new  OuterClass().new  InnerClass().inner();;
+  	}
+  	
+  	public class InnerClass{
+  		private int age = 2;
+  		void inner() {
+  			// lambda 表达式 没有引入新的作用域
+  		
+  			  System.out.println(v);						// 10
+  				System.out.println(age);					// 2
+  				System.out.println(this.age);				// 2
+  				System.out.println(InnerClass.this.age);	// 2
+  				System.out.println(OuterClass.this.age); 	// 1
+  				
+  			t.test(10);
+  		}
+  	}
+  }
+  ```
+
+- **既然, lambda 表达式没有引入新的作用域, 那么就引入了一个新的问题, 如下**
+
+  ```
+  package com;
+  public class OuterClass {
+  	private int age = 1;
+  	
+  	public static void main(String[] args) {
+  		new  OuterClass().new  InnerClass().inner();;
+  	}
+  	
+  	public class InnerClass{
+  		private int age = 2;
+  		void inner() {
+  			// lambda 表达式 没有引入新的作用域
+  			// int v = 18; // 错误, 重复定义
+  			Testable t = v -> { // lambda 表达式的这个V 只能在{}内有效
+  				System.out.println(v);						// 10
+  				System.out.println(age);					// 2
+  				System.out.println(this.age);				// 2
+  				System.out.println(InnerClass.this.age);	// 2
+  				System.out.println(OuterClass.this.age); 	// 1
+  			};
+  			t.test(10);
+  		}
+  	}
+  }
+  ```
+
+  
+
+## 5、lambda 表达式 对比 匿名类
+
+虽然我们前面说了:**当匿名类实现的是`函数式接口`的时候,我们可以使用lambda表达式对其进行优化** ,但是匿名类和Lambda 表达式还是有区别的, 下面我们就来介绍点lambda表达式与匿名类不同的地方
+
+1. **lambda 表达式不会引入新的作用域, 而匿名类会引入新的作用域** (因为匿名类虽然与普通类的定义书写方式不一样, 但是匿名类本质还是类), 具体差异如下:
+
+![lambda1](images/lambda1.jpg) 			![](images/lambda2.jpg) 
+
+
+
+# 十五、方法引用(method reference)  & lambda
+
+
+
+- **如果 Lambda 中的内容仅仅是调用某个方法, 可以使用方法引用(method reference)来简化** 
+
+  > 即, 以前我们我们使用lambda 表达式来简化匿名类实现的函数式接口
+  >
+  > 现在我们可以使用方法引用(method reference) 来简化lambda表达的书写
+
+
+
+| 种类                             | 用法                               |
+| -------------------------------- | ---------------------------------- |
+| 引用特定对象的实例方法           | ObjectName::instanceMethodName     |
+| 引用静态方法                     | **ClassName::staticMethodName   ** |
+| 引用特定类型的任意对象的实例方法 | **ClassName::methodName**          |
+| 引用构造方法                     | ClassName::new                     |
+| 引用当前类中定义的实例方法       | this::instanceMethdoName           |
+| 引用父类中定义的实例方法         | super::instanceMethodName          |
+
+**注意:**
+
+只有当lambda表达式中的内容, 仅仅是调用某个方法时, 我们才可以使用方法引用来简化lambda表达式的写法.
+
+换句话说, 当我们的lambda 表达式内的内容仅仅是调用某个方法时, 我们就是用方法引用来简化lambda表达式, 编译器会自动的将我们的方法引用再包装回lambda表达式.
+
+
+
+## 1、引用 类方法()
+
+所谓**引用类方法**, 就是当 `lambda表示` 的内容仅仅是调用某个**类方法** (静态方法)时, 我们可使用: **类名::类方法名(静态方法名)** 来简化lambda表示式 , 示例如下:
+
+```
+// 1. 定义一个函数式接口
+@FunctionalInterface
+public interface Testable{
+	int test(int v1, int v2);
+}
+
+// 使用lambda 表达式简化匿名类实现函数式接口
+Testable t1 = (v1 , v2) -> { 	return Math.max(v1, v2);};
+// Testable t1 = (v1 , v2) -> Math.max(v1, v2); 
+System.out.println(t1.test(10, 20)); // 20
+
+
+// 上面的 lambda 表达式, 可以使用 引用类方法计数简化为下面这种 
+Testable t1 = Math::max;		// 方法引用, 类方法引用(类名::静态方法名)
+System.out.println(t2.test(10, 20)); // 20
+```
+
+> 即: `(v1 , v2) -> { 	return Math.max(v1, v2);};`  或 ` (v1 , v2) -> Math.max(v1, v2); ` 可以简化为 : `Math::max;` 
 
 
 
 
 
+## 2、引用特定对象的实例方法
+
+所谓引用特定对象的实例方法, 就是当我们的lambda表达式中的内容, 仅仅是调用某个实例对象的某个方法时, 我们可以使用: **实例对象::实例方法名** 来简化lamba表达式的书写, 示例如下: 
+
+```
+// 定义接口(函数式接口)
+interface Testable{
+	void test(int v);
+}
+
+package com;
+public class Person {
+	private int age;
+	public void setAge(int age) {
+		this.age = age;
+		System.out.println("set age: " + age);
+	}
+	
+	public static void main(String[] args) {
+		Person person  = new Person();
+		// lambda表达式, 仅仅是调用某个实例的具体方法
+		Testable t1 = (v) -> person.setAge(v);
+		t1.test(10); 
+		
+		// 引用具体实例的实例方法, 简化lambda表达式的书写
+		Testable t2 = person::setAge;
+		t2.test(20);
+	}
+}
+```
 
 
 
+## 3、引用特定类型 的 任意对象的实例方法
+
+所谓, `引用特定类型 的 任意对象 的实例方法` 
+
+> 1. 对象的类型是确定的
+> 2. 对象是不确定的
+> 3. 对象的实例方法是确定的
+
+具体示例如下:
+
+```
+import java.util.Arrays;
+
+// 忽略大小写, 比较字符串
+String[] names = {"jack", "james", "Apple", "obort"};
+Arrays.sort(names, (name1, name2) -> name1.compareToIgnnoreCase(name2));
+System.out.println(Arrays.toString(names));
+
+// Arrays.sort(names, (name1, name2) -> name1.compareToIgnnoreCase(name2));
+// name1 表示的都是字符串, 因此类型是特定的
+// name1 表示的是不同的字符串实例对象,  因此是任意对象
+// compareToIgnnoreCase 实例方法名是固定的
+
+// 因此, 我们可以使用: 引用特定类型的任意对象的实例方法 简化lambda表达式, 如下:
+String[] names2 = {"jack", "james", "Apple", "obort"};
+Arrays.sort(names2, String::compareToIgnnoreCase);
+System.out.println(Arrays.toString(names2));
+```
+
+**注意:**
+
+引用特定类型的任意对象的实例方法, 在书写上与引用类方法 看上去是一样的, 但是实际上是不一样的
+
+如何区分呢? 
+
+-  `类名::静态方法` ,  `::` 右边的方法是静态方法 就是表示的是引用类方法
+- `类名::实例方法` , `::` 右边的方法是实例方法表示的就是 引用特定类型的任意对象的实例方法
 
 
 
+## 4、引用构造方法
 
+```
+@FunctionalInterface
+public interface Testable{
+	Object test(int v);
+}
+
+public class Person{
+	public Person(int age){
+		System.out.println("person age: " + age);
+	}
+}
+
+
+// lambda 表达式
+Testable t1 = v -> new Person(v);
+System.out.println(t1.test(18));
+
+// 引用构造方法
+Testable t2 = Person::new;
+System.out.println(t2.test(19));
+
+```
+
+
+
+## 5、引用数组的构造构造方法
+
+引用数组的构造方法与引用一般的构造方法的写法差不多. 
+
+- 引用 普通的构造方法时, 我们是这样写的: `类名::new`
+- 而应用数组的构造方法时, 我们只需要把`类名` 替换为具体的数组类型即可, eg: `int[]::new`  或 `String[]::new` 或 `Object[]::new` 等, 具体示例如下:
+
+```
+// 使用 lambda 表达式的写法
+Testable t1 = v -> new int[v];
+int[] arr = t1.test(3);
+System.out.prinntln(arr.length);
+
+// 使用 引用数组的构造方法
+Testable t2 = int[]::new;
+int[] arr2 = t2.test(5);
+System.out.println(arr2.length);
+```
+
+
+
+## 6、引用当前类中定义的实例方法
+
+简单的说, 引用具体(特定) 对象的实例方法与引用当前类中定义的实例方法类似, 其实就是 `实例对象::实例方法名`,
+
+如下: 
+
+```
+@FunctionalInterface
+public interface Testable{
+	void test(int v);
+}
+
+public class Person{
+	piblic void setAge(int age){
+		System.out.println("person set age: " + age);
+	}
+	
+	public void show(){
+		// 使用 lambda 表达式的写法
+		Testable t1 = v -> setAge(v);
+		t1.test(10);
+		
+		// 使用 引用方法的写法
+		Testable t2 = this::setAge;
+		t2.test(18);
+	}
+}
+```
+
+
+
+## 7、引用当前对象, 父类中的实例方法
+
+```
+@FunctionalInterface
+public interface Testable{
+	void test(int v);
+}
+
+public class Person{
+	piblic void setAge(int age){
+		System.out.println("person set age: " + age);
+	}
+}
+
+class Student extends Person{
+	@Override 
+	piblic void setAge(int age){
+		System.out.println("student set age: " + age);
+	}
+	
+	public void show(){
+		// 使用 lambda 表达式的写法
+		Testable t1 = v -> super.setAge(v);
+		t1.test(10);
+		
+		// 使用 引用方法的写法
+		Testable t2 = super::setAge;
+		t2.test(18);
+	}
+}
+```
+
+
+
+# 十六、枚举
+
+我们在平时的开发中, 如果一个变量的值只是在几个固定的值之间切换, 可以考虑使用枚举类型
+
+其实使用枚举类型有很多好处, 比如:
+
+- 变量的值的变化范围是可控的, 编译器会做容错校验, 避免手误
+- 使用枚举变量, 可以达到见名知意,  代码可读性更高
+
+其实, 枚举是由一组预定以的常量构成的, 除了使用JDK提供的方式定义枚举类型, 我们也可以使用java 类自定义实现枚举
+
+## 1、自定义类实现java中的枚举
+
+- 自定义类实现枚举
+
+  > 自定义类实现枚举功能, 有个缺陷就是不能使用switch
+  
+  ```
+  // 自定义类实现 春夏秋冬 枚举
+  public class Season{
+  	private Season(); // 私有化 构造方法, 禁止外部访问
+  	
+  	public static final Season SPRING = NEW Season();
+  	public static final Season SUMMER = NEW Season();
+  	public static final Season FALL = NEW Season();
+  	public static final Season WINTER = NEW Season();
+  }
+  
+  // 外部使用自定义枚举
+  public class Main{
+  	
+  	public static void main(String[] args){
+  		test(Season.SPRING);
+  	}
+  	
+  	public static void test(Season season){
+  		if(season == Season.SPRING){
+  			System.out.println("春天");
+  		}
+  		else if(season == Season.SUMMER){
+  			System.out.println("夏天");
+  		}
+  		else if(season == Season.FALL){
+  			System.out.println("秋天");
+  		}
+  		else if(season == Season.WINTER){
+  			System.out.println("冬天");
+  		}
+  	}
+}
+  ```
+  
+  
+
+## 2、java中枚举的定义
+
+- 使用java中的 **enum** 关键字定义枚举,如下:
+
+  ```
+  // 使用java提供的 enum 关键字, 定义季节的枚举
+  public enum Season{
+  	SPRING, SUMMER, FALL, WINTER
+  }
+  ```
+
+- 枚举的使用
+
+  ```
+  // 获取指定的枚举变量
+  Season s = Season.Winter;
+  
+  // 其实, 枚举变量有2个常用的方法, 一个是用来获取枚举的名字(字符串), 另有一个是用于获取枚举的序号, 如下: 
+  System.out.println("s.name"); // Winter
+  System.out.println("s.ordinal");
+  ```
+
+- java中枚举的switch
+
+  ```
+  // 定义枚举
+  public enum Season{
+  	SPRING, SUMMER, FALL, WINTER
+  }
+  
+  // 枚举switch 的使用
+  public void test(){
+  	Season s = Season.SUMMER;
+  		switch (s) {
+  		case SPRING:
+  			System.out.println("春天");
+  			break;
+  		case SUMMER:
+  			System.out.println("夏天");	
+  			break;
+  		case FALL:
+  			System.out.println("秋天");
+  			break;
+  		case WINTER:
+  			System.out.println("冬天");
+  			break; 
+  		default:
+  			break;
+  		}
+  }
+  ```
+
+## 3、枚举的本质(java类) 
+
+- java 中枚举的本质
+
+  其实, 在java中, 枚举的本质就是类, 所有的枚举类型最终都隐士继承自 **java.lang.Enum**
+
+  > 换句话说, 你表面上看是枚举类型, 其实编译器底层就是一个java类
+
+  ```
+  我们使用enum 定义的枚举类型
+  public enum Season{
+  	SPRING, SUMMER, FALL, WINTER
+  }
+  
+  其实编译器底层就差不多是下面这种样式, 但是有点差异哈
+  public class Season extends java.lang.Enum{
+  	private Season(); // 私有化 构造方法, 禁止外部访问
+  	
+  	public static final Season SPRING = NEW Season();
+  	public static final Season SUMMER = NEW Season();
+  	public static final Season FALL = NEW Season();
+  	public static final Season WINTER = NEW Season();
+  }
+  ```
+
+## 4、枚举中还可以定义成员变量和方法
+
+- 枚举定义完常量后, 可以再定义成员变量、方法等内容(这时最后一个常量要以分号结束).
+
+  >  从这一点也说明了java中的枚举的本质就是类, 示例如下:
+
+  ```
+  public enum Season{
+  	SPRING, SUMMER, FALL, WINTER; // 枚举中的常量必须写在 成员变量、方法的前面, 且后面写分号 ;
+  	private int age; 
+  	public void setAge(int age){
+  		this.age = age;
+  	}
+  	
+  	public int getAge(){
+  	 return age;
+  	}
+  }
+  
+  public static void main(String[] args) {
+  		Season s = Season.SUMMER;
+  		s.setAge(10);
+  		System.out.println(s.getAge()); // 10
+  	}
+  ```
+
+- 枚举的构造方法权限必须是**无修饰符 或 private**
+
+  一般来说,我们很少给枚举添加构造方法, 注意一下就可以了
+
+- java会主动调用构造方法初始化每个常量, 你不能主动调用枚举的构造方法.
+
+
+
+## 5、自定义了构造方法的枚举(高级用法)
+
+- 我们前面已经讲过了, java中的枚举的本质其实就是java类, 继承自`java.lang.Enum`
+- 且, java中的枚举除了可以定义枚举常量外, 我们还可以在枚举常量的后面定义成员变量, 成员方法, 自定义构造方法
+
+下面我们将以定义一个季节的枚举来举例说明, 枚举中定义成员变量, 成员方法, 以及自定义构造方法的应用场景
+
+```
+// 因为在定义枚举时, 可以在常量后面定义成员变量, 这个功能很好用, 比如:
+// 我们可以定义季节枚举, 自定义枚举的构造方法 ,并给每个季节有的温度描述一个范围
+enum Season{
+	SPRING(5, 15), 
+	SUMMER(25, 35),
+	FALL(15, 25),
+	WINTER(-5, 5);
+	
+	private int min;
+	private int max;
+	
+	public int getMin() {
+		System.out.println(this.name() + "最低温度: "+ min);
+		return min;
+	}
+
+	public int getMax() {
+		System.out.println(this.name() + "最高温度: "+ max);
+		return max;
+	}
+	
+	// 注意, 枚举定义的构造方法是不能被主动调用的, 是留给编译器, 构造枚举常量时自动调用的
+	Season(int min, int max){
+		this.min = min;
+		this.max = max;
+	} 
+}
+
+
+// 使用自定义枚举, 高级用法
+public static void main(String[] args) {
+		Season s = Season.SPRING;  // 编译器底层会自动调用构造方法 Season(5, 15);
+		s.getMax();	// SPRING最高温度: 15
+		s.getMin(); // SPRING最低温度: 5
+}
+```
+
+
+
+# 十七、数字(Number)
+
+
+
+## 1、基本类型的缺陷(3个)
+
+当我们说到数字时, 大家首先可能会想到的是基本数据类型(byte、short、int、long, double、float、char),基本类型用在使用中是有缺陷的, 下面我们来详细介绍一下:
+
+
+
+**对比引用类型, 基本类型存在一些缺陷你** 
+
+- 不能利用面向对象的方式去操作基本类型`(比如: 直接用基本类型调用方法)`
+
+- 基本类型不能用来描述不存在的值, 比如: `null` 值.
+
+  > 比如: 我们在描述一家店铺某天的营业情况时, 用基本数据类型就不好表达了, 如下:
+  >
+  > ```
+  > double[] shouRu = {100, -100, 0}; 
+  > 100表示当前挣了100元,   -100表示当前亏损了100元, 0表示当前不亏不赚
+  > 但是, 我们如果想要描述当天没有开门营业怎么描述呢? 用 `0` 不准确的有歧义, 用基本数据类型很难表示, 用引用类型就很准确简单了
+  > 比如: 用 String[] 就能很好的解决
+  > String[] shouRu = {"100", "-100", null, "0"}; // null 表示当前没有开门
+  > ```
+
+- 当方法的参数是引用类型时, 基本类型是无法传递的
+
+  ```
+  public void testObj(Object obj){
+  	System.out.println(obj);
+  }
+  
+  int age = 10;
+  String name = "张三";
+  // 本质上基本类型是不能传递给引用类型的, 但是这是java的语法糖, 是可以的
+  testObj(age);		// 这里不报错
+  testObj(name);
+  ```
+
+  
+
+那么, 我们在开发中如何解决上述基本类型的三大缺陷呢?
+
+解决办法是将基本类型包装成引用类型
+
+
+
+ ## 2、将基本数据类型包装成引用
+
+- 基本类型包装成引用类型, 示例:
+
+  ```
+  public class IntObject{
+  	private int value;
+  	public IntObject(int value){
+  		this.value = value;
+  	}
+  	
+  	public int getValue{
+  		return value;
+  	}
+  	
+  	public void setValue(int value){
+  		this.value = value;
+  	}
+  }
+  ```
+
+  
+
+- 基本类型包装成引用类型的应用
+
+  ```
+  IntObject[] shouRu = {
+  	new IntObject(100), 
+  	new IntObject(-100), 
+  	null, 
+  	new IntObject(0)
+  };
+  
+  shouRu[0].getValue;
+  ```
+
+
+
+## 3、包装类(wrapper class)
+
+- 其实java中已经内置类基本类型的包装类`(都在java.lang包中)`
+
+  其中数字类型(除了char 和 boolean)都是继承自**java.lang.Number** 
+
+  | 基本类型  | 包装类型     |
+  | --------- | ------------ |
+  | `byte`    | `Byte`       |
+  | `char`    | `Charactter` |
+  | `short`   | `Short`      |
+  | `int`     | `Integer`    |
+  | `long`    | `Long`       |
+  | `float`   | `Float`      |
+  | `double`  | `Double`     |
+  | `boolean` | `Boolean`    |
+
+  > 换句话说, 以后我们要想将基本类型包装成引用类型, 就不用自己再实现了, 直接使用JDK提供的即可
+
+
+
+## 4、自动装箱、拆箱(Autoboxing & unboxing)
+
+- **自动装箱**:
+
+  所谓的自动装箱, 就是指的java编译器会自动调用 **xxx.valueOf** 方法, 将基本类型装换为包装类型.
+
+  ```
+  Integer i1= 10; // 等价于 Integer i1= Integer.valueOf(10);
+  
+  void add(Integer num){}
+  add(20); // 等价于 add(Integer.valueOf(20));
+  ```
+
+  
+
+- **自动拆箱**:
+
+  所谓自动拆箱,就是指的java编译器会自动调用 **xxx.value** 方法, 将包装类型转换为基本类型
+
+  ```
+  Integer i1 = 10;
+  int i2 = i1; // 等价于 int i2 = i1.intValue();
+  
+  System.out.println(i1 == 10);
+  // 等价于 System.out.prinntln(i1.intValue() == 10);
+  
+  Integer[] array = {11, 22, 33};
+  int result = 0;
+  for (Integer i : array){
+  	// i.intValue() % 2 == 0;
+  	if(i % 2 == 0){
+  		result += i; // result += i.intValue();
+  	}
+  }
+  ```
+
+  
+
+  > 说白了, 在以后java的开发中, 可以把基本类型当做 引用类型来用
+  >
+  > 也可以将引用类型当做基本类型来用
+  >
+  > 因为java有自动装箱和拆箱的机制
+
+  
+
+## 5、包装类型的判断等
+
+- 包装类的判断, 不要使用 `==` 、`!=` 运算符, 应当使用`equals` 方法.
+
+  > equals() 方法, 是用来判断包装类型里面存储的基本类型是不是一样的
+  >
+  > ```
+  > // equals 方法的定义如下: 
+  > public boolean equals(Object obj) {
+  >   if (obj instanceof Integer) {
+  >   	return value == ((Integer)obj).intValue();  // 注意. 右边对obj 进行了强转!
+  >   }
+  >   return false;
+  > }
+  > ```
+
+  ```
+  Integer i1 = 100;
+  Integer i2 = 100;
+  Integer i3 = 200;
+  Integer i4 = 200;
+  
+  // 不推荐
+  System.out.println(i1 == i2); 	// true
+  System.out.println(i3 == i4);	// false
+  
+  // 推荐
+  System.out.println(i1.equals(i2)); 	// true
+  System.out.println(i3.equals(i4));  // true
+  ```
+
+  从上面的例子中我们就发现一个现象, 同样的操作为什么 `i1 == i2)` 的结果为`true`  , 而 `(i3==i4))` 为`false` 呢? 
+
+  其实, 是这样的, 在`Integer` 这个类中其实是有个静态嵌套类`IntegerCache` (Integer缓存类) , 我们从**Integer 类中定义的 valueOf(int i) 这个方法可以发现** 如下: 
+
+  ```
+  // Integer 中valueOf(int i)方法 定义的如下: 
+  public static Integer valueOf(int i) {
+      if (i >= IntegerCache.low && i <= IntegerCache.high)
+          return IntegerCache.cache[i + (-IntegerCache.low)];
+      return new Integer(i);
+  }
+  
+  // IntegerCache 静态嵌套类的定义如下:
+  private static class IntegerCache {
+    static final int low = -128;
+    static final int high;
+    static final Integer cache[];	// 从这里我们可以看出 会缓存一些列的 Integer对象
+  	
+  	static {
+      // high value may be configured by property
+      int h = 127;
+      String integerCacheHighPropValue =
+      sun.misc.VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
+      if (integerCacheHighPropValue != null) {
+      	try {
+      		int i = parseInt(integerCacheHighPropValue);
+     			i = Math.max(i, 127);
+      		// Maximum array size is Integer.MAX_VALUE
+      		h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
+      	} 
+      	catch( NumberFormatException nfe) {
+      		// If the property cannot be parsed into an int, ignore it.
+      	}
+      }
+      high = h;
+  
+    	cache = new Integer[(high - low) + 1];
+    	int j = low;
+    	for(int k = 0; k < cache.length; k++)
+    	cache[k] = new Integer(j++);
+  
+    	// range [-128, 127] must be interned (JLS7 5.1.7)
+    	assert IntegerCache.high >= 127;
+    }
+  
+  	private IntegerCache() {}
+  }
+  ```
+
+  > 从Integer的源码, 我们可以发现, 当一个数字是 [-128 ~ 127] 的话, 我们使用 Integer.valueOf() 方法时, 取出的就是缓存对象
+
+**结论:**
+
+1. 当我们使用 **Integer.valueOf(10)**这种方法创建出来的包装对象时, JDK编译器会对 -128 ~ 127 之间的Integer 对象进行缓存
+
+   > 换句话说, 当我们使用 Integer i1 = 10; 这种语法糖时`(内部调用的是 Integer.valueOf(10))` , 如果数字 是-128~127 之间的数字那么返回的就是缓存的Integer对象
+
+2. 当我们使用 **new Integer(10)** 这种方法创建出来的包装对象时, JDK编译器不会对新建的 Integer对象进行缓存
+
+3. **当我们在判断 包装类型时, 不要使用`==` 或者 `!=` , 因为容易出现误操作, 所以还是要用 equals 方法** 
+
+
+
+## 6、使用注意
+
+- **基本类型数组**  与 **包装类型数组** 之间是不能自动装箱、拆箱的.
+
+  ```
+  public static void test1(Integer[] nums){}
+  public static void test2(int[] nums){}
+  
+  int[] nums1 = {11, 22};
+  test1(nums1); 					// error
+  Integer nums2 = nums1; 	// error
+  
+  Integer[] nums3 = {11, 22};
+  test2(nums3); 					// error
+  int[] nums4 = nums3; 		// error
+  ```
+
+
+
+# 十八、Math
+
+- **Math** 这个类提供了常见的数学计算功能, 定义在 `java.lang.Math` 包中.
+
+  - 常用的常量 (static final)
+
+    ```
+    // 自然常数, 自然对数的底数
+    public static final double E = 2.7182818284590452354;
+    
+    // 圆周率
+    public static final double PI = 3.14159265358979323846;
+    ```
+
+  - 常用的数学方法
+
+    ```
+    Math.abs(-100); 				// 求绝对值: 100
+    Math.max(100, 200);			// 求最大值: 200
+    Math.min(100, 200);			// 求最小值: 100
+    Math.floor(3.9);				// 向下取整: 3.0
+    Math.ceil(3.1);					// 向上取整: 4.0
+    Math.round(3.5);				// 四舍五入: 4
+    Math.pow(4, 2);					// 4的2次方: 16
+    Math.sqrt(16);					// 16的平方根: 4
+    ```
+
+    
+
+  
 
 
 
