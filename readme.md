@@ -8,6 +8,8 @@
 
   Mac 中为 `option + command + s`
 
+- 抽取方法的快捷键: 先框选需要抽取的代码, 然后`alt+shift+m`, mac  的话是 `option+command+m`
+
   
 
 
@@ -4484,9 +4486,7 @@ public static void main(String[] args) {
   int[] nums4 = nums3; 		// error
   ```
 
-
-
-# 十八、Math
+## 7、Math 类
 
 - **Math** 这个类提供了常见的数学计算功能, 定义在 `java.lang.Math` 包中.
 
@@ -4511,11 +4511,865 @@ public static void main(String[] args) {
     Math.round(3.5);				// 四舍五入: 4
     Math.pow(4, 2);					// 4的2次方: 16
     Math.sqrt(16);					// 16的平方根: 4
+    
+    
+    Math.exp(2);	// E的2次方
+    Math.log(8);	// 求ln8的值, 以E为底数, 8为真数的对数 (即, 计算E的多少次方为8)
+    
+    //角度弧度
+    double degree = 90;
+    double radian = Math.toRadians(degree);
+    
+    // 三角函数
+    Math.sin(radian);
+    Math.cos(radian);
+    Math.tan(radian);
+    
+    // 随机数
+    Math.random(); // 生成[0.0, 1.0) 范围的随机数(包括0.0, 不包括1.0)
     ```
 
     
 
+## 8、Random 类
+
+Random 类定义在`java.lang.Random` 中, 可以更方便地生成各种随机数
+
+- 生成各种随机数
+
+  ```
+  // 生成没有范围的随机数
+  Random r = new Random();
+  r.nextBoolean();
+  r.nextInt();
+  r.nextLong();
+  r.nextFloat();
+  r.nextDouble();
   
+  // 有范围的生成随机数
+  random.nextInt(100); // 生成[0, 100) 随机数 包含0 不包含100
+  ```
+
+  
+
+## 9、UUID (重要!!)
+
+- UUID (Universally Unique Identifier) , 通用唯一标识符
+
+  UUID的目的是让分布式系统中的所有元素都有唯一的标识符, 而不需要通过中央控制端来做标识符的指定
+
+- 在java中, 可以利用**java.util.UUID** 类的 `randomUUID` 方法生成一个`128bit` (32位16进制数) 的随机UUID
+
+  ```
+  // 6a9bb186-fc68-4352-9896-49b5dfca7c49
+  System.out.println(UUID.randomUUID());
+  ```
+
+> 我们在做服务器开发时, 有时需要给每条记录都生成一个随机的唯一标识, 不可能每次生成唯一标识时都由同一台服务器生成这样必然会降低访问速度, 且真实的情况是用户访问的是分布式服务器中的一台服务器, 这时我们就可以使用访问的任意一台服务器生成一个随机的UUID, 即便是不同的服务器主机, 生成的唯一标识也是不会重复相同的
+>
+> 所以, 即便是分布式开发, 也可以放心大胆的使用这个方法为每条记录生成一个唯一的UUID
+>
+> (这个常识需要记住)
+
+## 10、数字格式化
+
+- 可以使用 `System.out.printf` 或者`System.out.format` 输出格式化的字符串
+
+  > System.out.printf 内部是调用 System.out.format 的, 所以他们是完全等价的
+
+  ```
+  // System.out.printf 的定义
+  public PrintStream printf(String format, Object ... args) {
+  	return format(format, args);
+  }
+  
+  
+  int age = 18;
+  double height = 1.88;
+  System.out.printf("年龄: %s, 身高: %.2f",age, height);
+  ```
+
+- 可以使用 `String.format` 创建格式化字符串
+
+- 其它示例:
+
+  ```
+  long num = 232545;
+  System.out.printf("%d %n", num);
+  System.out.printf("%08d %n", num);
+  System.out.printf("%+8d %n", num);
+  System.out.printf("%+08d %n", num);
+  System.out.printf("%+,8d %n", num);
+  System.out.printf("%+,8d %n", num);
+  System.out.printf("%+,8d %n", num);
+  // 打印:
+  232545 
+  00232545 
+   +232545 
+  +0232545 
+  +232,545 
+  +232,545 
+  +232,545 
+  
+  double pi = Math.PI;
+  System.out.printf("%f %n", pi);
+  System.out.printf("%.3f %n", pi);
+  System.out.printf("%8.3f %n", pi);
+  System.out.printf("%08.3f %n", pi);
+  System.out.printf("%-8.3f %n", pi);
+  // 打印:
+  3.141593 
+  3.142 
+     3.142 
+  0003.142 
+  3.142 
+  ```
+
+  | 转换符 | 作用                   |
+  | ------ | ---------------------- |
+  | `d`    | `十进制整数`           |
+  | `f`    | `浮点数`               |
+  | `n`    | `换行, 跟 \n 效果一样` |
+
+  | 标记   | 作用                          |
+  | ------ | ----------------------------- |
+  | `08`   | `8个字符的宽度, 前面用0补齐`  |
+  | `+`    | `显示符号 (正数+, 负数-)`     |
+  | `,`    | `显示分组字符(本地化)`        |
+  | `-`    | `左对齐`                      |
+  | `.3`   | `保留3位小数`                 |
+  | `10.3` | `10个字符的宽度, 保留3位小数` |
+
+  
+
+## 11、DecimalFormat
+
+- 使用**java.text.DecimalFormat** 可以更好地控制 `前0`、`后0`、`前缀` 、`后缀` 、`分组分隔符` 、十进制分隔符等
+
+  ```
+  // 自定一个Decimal format 格式输出
+  static void customPrint(String pattern, double value) {
+    // 1. 根据样式 pattern 创建一个 format
+    DecimalFormat fmtDecimalFormat = new DecimalFormat(pattern);
+    // 2. 格式化输出
+    System.out.println(fmtDecimalFormat.format(value));
+  }
+  
+  customPrint("###,###.###", 1230456.789);
+  customPrint("###.##", 1230456.789);
+  customPrint("000000.00", 456.789); 
+  customPrint("$###,###.###", 1230456.789);
+  // 打印结果
+  1,230,456.789
+  1230456.79
+  000456.79
+  $1,230,456.789
+  ```
+
+  
+
+## 12、字符串转数字 valueOf、parseXX
+
+- 使用包装类的 **valueOf、parseXX** 方法
+
+  > 一般使用 `valueOf` 将基本类型或者字符串转化为 包装类型
+  >
+  > 使用 `parseXX`将字符串转化为基本数据类型
+
+  ```
+  Integer i1 = Integer.valueOf("ff", 16) ; // 将字符串按照16进制格式解析
+  Integer i1 = Integer.valueOf("12");
+  int i2 = Integer.parseInt("12");
+  
+  // 如果想要解析 16进制的字符串, 需要额外传一个参数告诉编译器, 这个字符串是那个格式的
+  // 因为默认情况下 parseInt 会将字符串按10进制格式进行解析, 这一点知道一下
+  int i3 = Integer.parseInt("ff", 16);		// 将字符串按16进制解析
+  
+  Float f1 = Float.valueOf("12.34");
+  float f2 = Float.parseFloat("12.34");
+  ```
+
+**注意:**
+
+因为在java中有对于基本类型有 `自动装箱` 和 `自动拆箱` 的特点, 所有有些人认为`Integer.valueOf("12");`  和 `Integer.parseInt("12");` 是没有差异的, 因为当他们按照下面写代码时编译器不会报错:
+
+```
+Integer i1 = Integer.valueOf("12");		
+int i2 = Integer.parseInt("12");
+
+
+int i3 = Integer.valueOf("12");				// 因为语法糖不报错
+Integer i4 = Integer.parseInt("12");	// 因为语法糖不报错
+```
+
+因此他们会误认为`valueOf` 和 `parseInt` 一样, 或者等价, 但是他们是有本质的区别的, 这个我们在java开发中是需要注意的
+
+
+
+所以, 如果想要将字符串转换为包装类型就用 valueOf, 想要获取基本类型就使用 parseXX, 这才是正确的姿势. 
+
+
+
+## 13、数字转字符串 valueOf、toString
+
+- 使用字符串的 `valueOf` 方法, 包装类的 `toString` 方法
+
+  ```
+  String str1 = String.valueOf(12.34);			// 12.34
+  String str2 = Integer.toString(255);			// 255
+  
+  // 将整数转换成 16进制的字符串
+  String str3 = Integer.toString(255, 16); 	// ff
+  String str4 = Float.toString(12.34f);			// 12.34
+  ```
+
+  
+
+## 14、高精度计算
+
+- `float` 、`double` 存储的只是小数的近似值, 并非精确值, 因此不适合用来进行精度计算
+
+  - 如下:
+
+    ```
+    double d1 = 0.7;
+    double d2 = 0.7;
+    // 0.48999999999999994  != 0.49
+    System.out.println(d1 * d2);
+    ```
+
+    ![](images/savefloatbinary.jpg) 
+
+    因为浮点数在内存中的存储方式就决定了, 浮点数不可能将数据记录的很准去, 数字越小误差越大
+
+- 建议使用**java.math.BigDecimal** 来进行高精度计算
+
+  - 建议使用字符串初始化`BigDecimal` 因为`float, double` 存储的都是近似值, 不是精确值
+
+    ```
+    new BigDecimal(0.7);  // 这样搞出来的bigDecimal 就是不精确的, 有误差
+    // 你使用一个不准确的浮点数 `0.7` 得到的一个BigDecimal 肯定是不准确的
+    ```
+
+  - BigDecimal 的正确使用姿势
+
+    ```
+    import java.math.BigDecimal;
+    
+    // BigDecimal d1 = new BigDecimal(0.7);	// 不能这样做, 不准确
+    // BigDecimal d2 = new BigDecimal(0.7); // 不能这样做, 不准确
+    
+    BigDecimal d1 = new BigDecimal("0.7");
+    BigDecimal d2 = new BigDecimal("0.7");
+    
+    System.out.println(d1.add(d2));			// 加, 1.4
+    System.out.println(d1.subtract(d2));	// 减, 0.0
+    System.out.println(d1.multiply(d2));	// 乘, 0.49
+    System.out.println(d1.divide(d2));		// 除, 1
+    System.out.println(d1.setScale(3));		// 保留3位小数, 0.700
+    
+    其实, 多个BigDecimal实例对象进行运算后,得到的依然是一个BigDecimal实例对象
+    ```
+
+    
+
+# 十八、字符串 String
+
+## 1、String 易错点
+
+- java中 `java.lang.String` 类代表字符串
+
+  底层使用`char[]` 存储字符数据, 从java9开始 底层使用`byte[]`存储字符数据
+
+  ```
+  char[] cs = {'a', 'b', 'c'};
+  String str = "abc"; 
+  
+  在java中, 你不能认为 char[] 与 String 等价, 
+  ```
+
+- 所有字符串字面量(比如: "abc") 都是String的实例对象
+
+- String 对象一旦创建完毕, 它的字符内容是不可以修改的(即, 你可以认为字符串是不可变的)
+
+  ```
+  String str1 = "111";
+  str1 += "222";
+  str1 = "333";
+  test(str1);
+  System.out.println(str1);		// 结果依然是 "333"
+  
+  void test(String s){
+  	s += "444";
+  }
+  ```
+
+  > 换句话说,  String 引用指向的内容是不能像其他java对象一样通过一个方法来修改, 这是一个易错点
+  >
+  > 即, 我们只能修改String引用的指向, 不能修改指向的内容
+
+## 2、字符串常量池(String Constant pool)
+
+```
+String s1 = "123";
+String s2 = "123";
+System.out.println(s1 == s2); // true
+```
+
+- 在java中字符串有个常量池(String Constant Pool, 简称 SCP) 
+
+  - 从java7开始, 常量池属于堆空间一部分(以前放在方法区) 
+
+- 当遇到字符串字面量是, JDK 就会去查看SCP. 
+
+  - 如果SCP中存在与字面量内容一样的字符串对象A时, 就直接返回对象A (换句话说就不会新建一个字符串实例)
+  - 否则, 创建一个新的字符串对象D, 并将D加入到SCP中, 返回D
+
+  
+
+  
+
+## 3、字符串的初始化
+
+```
+String s1 = "123";
+String s2 = new String("123");
+String s3 = new String(s1);
+String s4 = new String(s2);
+
+char[] cs = {'1', '2', '3'};
+String s5 = new String(cs);
+String s6 = new String(s5);
+```
+
+
+
+## 4、intern 方法
+
+- A.intern 方法的作用
+
+  - 如果常量池(SCP) 中存在与A内容一样的字符串对象C时, 就返回C
+  - 否则, 将A加入到常量池(SCP) 中, 返回A;
+
+  ```
+  int a = 1, b = 2, c = 3;
+  String s1 = String.format("%d%d%d", a,b,c);
+  String s2 = String.format("%d%d%d", a,b,c);
+  
+  String s3 = s1.intern();
+  String s4 = s2.intern();
+  String s5 = "123";
+  
+  System.out.println(s1 == s2);	// false
+  System.out.println(s1 == s3); // true
+  System.out.println(s1 == s4); // true
+  System.out.println(s1 == s5); // true
+  ```
+
+## 5、字符串常量方法
+
+```
+" 123 456  ".trim();	// 取出首位的空格
+"abc".toUpperCase();	// 转为大写字母 ABC
+"ABC".toLowerCase();	// 转为小写字母 abc
+"12345".contains("1"); // 是否包含某个字符串
+"123456".startWith("123"); // 是否以某个字符串开头
+"123456".endWith("456");	// 是否以某个字符串结尾
+"1_2_3_4_5_6".split("_"); // 将字符串分隔为 ["1","2","3","4","5","6"]
+
+"abc".compareTo("adc"); // 比较字符串大小 < 0
+"abc".compareToIgnoreCase("ADC"); // 忽略大小写比较字符串大小 < 0
+"abc".equals("abd"); 	// 看字符串内容是否相同
+"abc".equalsIgnoreCase("abd"); 	// 忽略大小写看字符串内容是否相同
+```
+
+
+
+## 6、字符串截取
+
+```
+"123456789".substring(2); 	 // 从第二位开始截取
+"123456789".substring(2, 5); // 从第二位开始到第五截取
+"123456789".indexOf("3");	 // 获取索引
+"123456789".lastIndexOf("3"); // 获取倒序索引
+```
+
+
+
+## 7、StringBuilder
+
+### 1、StringBuilder 的简单介绍
+
+- 在进行大量的字符串的改动操作时(比如:拼接、替换)
+
+  - 使用String会非常的消耗内存、降低程序的性能 (因为String对象是不可变的, 每次操作会产生新对象)
+  - 使用StringBuilder可以节省内存、提高访问速度
+
+  ```
+  String s1 = "";
+  s1 += "111";
+  s1 += "222";
+  
+  StringBuilder s2 = new StringBuilder();
+  s2.append("111").append("222");
+  // 因为我们在使用StringBuilder 的方法进行操作后, 方法返回的是this(StringBuilder)对象本身
+  // 因此我们在使用StringBuilder时很多时候可以使用 链式编程简化代码的书写
+  ```
+
+  - StringBuilder 的常用方法有: **append、insert、delete、replace、reverse** 等
+
+**注意:**
+
+- StringBuilder 并不是String 的子类 或者 父类
+- String 和 StringBuilder 都实现了 CharSequence 接口
+
+> 如果以后在操作字符串时, 要求传一个`CharSequence` 类型的对象, 那么String 和StringBuilder 都可以
+
+
+
+### 2、StringBuilder 的 append 原理
+
+- StringBuilder 的原理就是它内部有个动态的char[] 数组, 和动态的数组原理一样
+
+- StringBuilder默认的容量是16, 扩容后的新容量是原来的2倍+2
+
+  - 16 扩容为 34
+  - 34 扩容为 70
+  - 70扩容为 142
+  - ... ...
+
+  ```
+  // StringBuilder 的构造方法定义如下:
+  public StringBuilder() {
+  		// super的定义 AbstractStringBuilder(int capacity) { value = new char[capacity];  }
+      super(16); 
+  }
+  
+  
+  ```
+
+  
+
+# 十九、日期 Date
+
+## 1、Date的介绍与简单使用
+
+- **java.util.Date** 是开发中经常用到的日期处理类.
+
+  注意: 不是`java.sql.Date` 类
+
+  - 一个Date对象, 包含了年月日时分秒等信息
+
+  ```
+  // d1 和 d2 都代表当前时间
+  Date d1 = new Date();
+  Date d2 = new Date(System.currentTimeMillis()); // 传入时间的毫秒数
+  
+  System.out.println(d1);
+  System.out.println(d2);
+  
+  // 打印:
+  Thu Oct 22 08:02:58 CST 2020  // 周四 10月 22日 08:02:58 中国标准时间 2020 年
+  Thu Oct 22 08:02:58 CST 2020
+  ```
+
+  > CST 是 China standard Time 的缩写
+
+  - 我们在创建Date时可以传入一个 long 类型的毫秒时间, 具体定义说明如下:
+
+    > public Date(long date) {
+    >
+    > ​    fastTime = date;
+    >
+    >   }
+    >
+    > 比如: new Date(123); 相当于是 获取一个 1970年1月1日 00:00:00 GMT + 123 毫秒的日期
+
+- **System.currentTimeMillis()** 返回的是 从`1970年1月1日 00:00:00 GMT ` 开始计时的毫秒数
+
+
+
+## 2、Date常用方法
+
+- Date 的毫秒操作
+
+  ```
+  Date d1 = new Date();
+  // 获取从1970年1月1日00:00:00 GMT开始到现在的毫秒数
+  System.out.println(d1.getTime());	// 获取毫秒 1603329270962
+  
+  d1.setTime(2000);	// 设置毫秒
+  System.out.println(d1.getTime());	// 2000
+  ```
+
+- Date 的比较操作
+
+  ```
+  Date d1 = new Date();
+  Date d2 = new Date();
+  
+  d1.setTime(2000);
+  
+  // 比较时间
+  d1.after(d2); 		// false
+  d1.before(d2); 		// true
+  d1.compareTo(d2); // -1   (-1 0 1)
+  
+  ```
+
+
+
+## 3、日期格式化 SimpleDateFormat 
+
+- **java.text.SimpleDateFormat** 常用来进行日期的格式化处理
+
+  ```
+  SimpleDateFormat fmt = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");		// HH24小时制
+  // 1. 通过日期格式fmt对象, 将Date对象转换成对应格式的字符串
+  String dateStr = fmt.format(new Date());
+  System.out.println(dateStr);
+  
+  // 2. 通过日期格式fmt对象, 将指定格式的日期字符串, 转换成Date对象
+  Date date = fmt.parse(dateStr);
+  System.out.println(date);
+  
+  SimpleDateFormat fmt2 = new SimpleDateFormat("yyyy年MM月dd日 hh:mm:ss");		// hh12小时制
+  System.out.println(fmt2.format(new Date()));
+  
+  // 打印:
+  2020年10月22日 15:06:44
+  Thu Oct 22 15:06:44 CST 2020
+  2020年10月22日 03:06:44
+  ```
+
+  > SimpleDateFormat 的转换原理就是:使用真实的数字替换: `yyyy`、`MM`、`dd`、`HH 或 hh`、`mm`、`ss`
+  >
+  > 年份替换yyyy, 月份替换MM, 日期替换dd 
+  >
+  > 24小时制时数替换HH, 12小时制时数替换hh, 分钟数替换mm, 秒数替换ss
+  >
+  > 其它的字符原样拼接输出
+
+- SimpleDateFormat 的模式字母
+
+| 字母 | 元素                     | 示例             |
+| ---- | ------------------------ | ---------------- |
+| `G`  | `Era标志`                | `AD`             |
+| `y`  | `年`                     | `1996;96`        |
+| `M`  | `年中的月份`             | `july; jul; 07`  |
+| `w`  | `年中的周数`             | `27`             |
+| `W`  | `月份中的周数`           | `2`              |
+| `D`  | `年中的天数`             | `189`            |
+| `d`  | `月份中的天数`           | `10`             |
+| `F`  | `月份中的星期`           | `2`              |
+| `E`  | `星期中的天数`           | `Tuesday; tue`   |
+| `a`  | `Am/pm 标记`             | `PM`             |
+| `H`  | `一天中的小时数(0~23)`   | `0`              |
+| `k`  | `一天中的小时数(1~24)`   | `24`             |
+| `K`  | `am/pm 中的小时数(0~11)` | `0`              |
+| `h`  | `am/pm 中的小时数(1~12)` | `12`             |
+| `m`  | `小时中的分钟数`         | `30`             |
+| `s`  | `分钟中的秒`             | `55`             |
+| `S`  | `毫秒数`                 | `978`            |
+| `z`  | `时区`                   | `GMT-08:00; PST` |
+| `Z ` | `时区`                   | `-08:00`         |
+
+​	
+
+# 二十、日历Calendar 
+
+
+
+- **java.util.Calendar** 也是开发中经常用到的日期处理类
+
+  它的功能比Date 更加丰富, Date 中很多过期的方法都迁移到了Calendar中
+
+  ```
+  // Calendar 是一个抽象类, 不能像一般的类一样new
+  Calendar calendar = Calendar.getInstance();
+  		
+  // 年份
+  calendar.get(Calendar.YEAR);
+  // 月份 (取值[0~11], 0是1月, 11是12月)
+  calendar.get(Calendar.MONTH);
+  // 一月中的第几天 ( 取值[1~31])
+  calendar.get(Calendar.DAY_OF_MONTH);
+  // 一周中的第几天 (取值 [1~7], 1是星期天, 2是星期一... ... 7是星期六)
+  calendar.get(Calendar.DAY_OF_WEEK);
+  // 一年中的第几天 (取值[1~366])
+  calendar.get(Calendar.DAY_OF_YEAR);
+  // 时
+  calendar.get(Calendar.HOUR);
+  // 分
+  calendar.get(Calendar.MINUTE);
+  // 秒
+  calendar.get(Calendar.SECOND);
+  // 毫秒
+  calendar.get(Calendar.MILLISECOND);
+  ```
+
+- Calendar 的常用方法
+
+  ```
+  Calendar calendar = Calendar.getInstance();
+  // 2019年7月6日
+  calendar.set(2019, 07, 06);
+  // 2019年7月11日
+  calendar.add(Calendar.DAY_OF_MONTH, 5);
+  // 2019年9月11日
+  calendar.add(Calendar.MONTH, 2);
+  
+  // 设置Date对象
+  calendar.setTime(new Date());
+  // 获取Date对象
+  calendar.getTime();
+  
+  // 设置毫秒数
+  calendar.setTimeInMillis(System.currentTimeMills());
+  // 获取毫秒数
+  calendar.getTimeInMillis();
+  ```
+
+  
+
+# 二一、异常(Exception)
+
+
+
+## 1、开发中的错误
+
+- 在开发java程序的过程中, 会遇到各种各样的错误
+
+  - 语法错误
+
+    会导致编译失败, 程序无法正常运行
+
+  - 逻辑错误
+
+    比如执行加法操作时, 不小心写成了减法操作
+
+  - 运行时错误 **(也叫 异常)** 
+
+    在程序运行过程中产生的意外, 会导致程序终止运行
+
+- java中所有的异常最终都继承自**java.lang.Throable** 
+
+  ![](images/javaexcption.jpg)   
+
+- 检查型异常(Checked Exception)
+
+  **检查性异常必须使用 try catch 或 throws 处理, 否则编译器报错** 
+
+  > 其实所谓的检查性异常, 一般都是提示我们需要多做几步的检查, 保证程序健壮性, 比如: 文件不存在, 判断权限不支持, 判断环境是否满足等... ... 
+
+  - 这类异常一般难以避免, 编译器会进行检查
+
+  - 如果开发者没有处理这类异常, 编译器将会报错
+
+  - 除**Error、RuntimeException** 以外的异常, 都是检查型异常
+
+  - 常见的**检查型异常** 
+
+    ```
+    // java.io.FileNotFoundException 文件不存在
+    FileOutputStream fos = new FileOutputStream("F:/yr/com/abc.jpg");
+    
+    SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-ddd");
+    // java.text.ParseException 字符串的格式不对
+    Date date = fmt.parse("2006/10/8");
+    
+    // java.lang.InterruptedException
+    Thread.sleep(1000);
+    
+    // java.lang.ClassNotFoundException 不存在这个类
+    Class cls = Class.forName("Dog");
+    
+    Class cls = null; 
+    // java.lang.InstantiationException 没有无参构造方法
+    // java.lang.IllegalAccessException 没有权限访问构造方法
+    cls.newInstance();
+    ```
+
+    
+
+- 非检查型异常(Unchecked Exception)
+
+  > 一般非检查性异常是可以通过代码来避免的, 比如: 判空null 
+
+  - 这类异常一般可以避免(你写代码稍微注意一下就避免了), 编译器不会进行检查
+
+  - 如果开发者没有处理这类异常, 编译器将不会报错
+
+  - **Error、RuntimeException** 这类就是非检查型异常
+
+  - 常见的非检查性异常
+
+    ```
+    // 下面两个都是Error
+    for(int i = 0; i < 200; i++) {
+      // java.lang.OutOfMemoryError 内存不够用错误
+      long[] arr = new  long[10_0000_0000];
+    }
+    
+    // java.lang.StackOverflowError
+    public static void test(){
+    	test();
+    }
+    
+    // 下面是runtime exception
+    StringBuilder s = null;
+    // java.lang.NullPointerException (RuntimeException 运行时异常)
+    s.append("abc");
+    
+    // java.lang.NumberFormatException 参数非法
+    new Integer("abc");
+    
+    int[] arr = {1,3,3};
+    // java.lang.ArrayIndexOutOfBoundsException 数组越界
+    int rst = arr[3];
+    
+    Object obj = "123.4";
+    // java.lang.ClassCastException	// 类型不匹配
+    Double d = (Double)obj;
+    ```
+
+    
+
+
+
+- 异常的处理
+  - 序产生了异常, 一般我们会称之为: **抛出了异常** 
+  - 不管抛出的是检查型异常, 还是非检查型异常
+    - 只要程序员没有主动去处理它, 都会导致java程序 **终止运行** 
+  - 异常处理通常有2种方式:
+    - **try - catch** : 捕获异常
+    - **throws** : 将异常往上抛出
+
+
+
+
+
+**总结:** 
+
+所谓 **检查性异常** 就是编译器提示我们这个API 可能会出现某种错误, 需要我们使用代码对可能出现的异常做排查, 以便保证代码的健壮性, 比如: 读取文件不存在的检查
+
+**非检查性异常** 一般是语法上面的错误, 这种编译器一般难通过语法检查, 比如: 参数类型错误, 数组越界这类, 需要我们在写代码时多做判断检查来规避
+
+
+
+## 2、try - catch
+
+```
+try{
+	// 代码1
+	// 代码2 (可能会抛出异常)
+	// 代码3
+}
+catch(异常A e){
+	// 当抛出[异常A]类型时, 会进入这个代码块
+}
+catch(异常B e){
+	// 当没有抛出[异常A]类型
+	// 但抛出[异常B]类型异常时, 会来到这个代码块
+}
+catch(异常C e){
+	// 当没有抛出[异常A] [异常B]类型
+	// 但抛出[异常C]类型的异常时, 会进入这个代码块
+}
+// 代码4 ... ... 
+
+// 注意:
+[异常A] 不可以是[异常B, C] 的父类型
+[异常B] 不可以是[异常C] 的父类型
+```
+
+- 代码的执行流程说明
+
+  - 如果[代码2]没有抛出异常
+
+    1. [代码1, 3]都会被执行
+
+    2. 所有的 catch 都不会被执行
+
+    3. [代码4]会被执行
+
+  - 如果[代码2]抛出异常
+
+    1. [代码1]会被执行, [代码3]不会被执行
+
+    2. 会选择匹配的 catch 来执行
+    3. [代码4] 会被执行
+
+**写在 try{} 中的某条代码一旦抛出异常, 那么try{}里面的这条语句后面的代码就没有机会再执行了** 
+
+**父类型的异常必须写在子类型的后面**
+
+
+
+
+
+## 3 Throwable 常用方法
+
+![](images/javaexcption.jpg) 
+
+- 如上图所示, 所有的异常都是继承自**Throwable** 的
+
+- **Throwable 的常用方法**
+
+  ```
+  try{
+  	Integer i = new Integer("abc");
+  }
+  catch(NumberFormatException e){
+  	// 1. 异常描述
+  	System.out.println(e.getMessage());
+  	System.out.println("----------------------");
+    // 2. 异常名称 + 异常描述
+    System.out.println(e);
+    System.out.println("----------------------");
+    // 3. 打印堆栈信息
+    e.printStackTrace();
+  }
+  
+  // 打印:
+  For input string: "abc"
+  ----------------------
+  java.lang.NumberFormatException: For input string: "abc"
+  ----------------------
+  java.lang.NumberFormatException: For input string: "abc"
+  	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+  	at java.lang.Integer.parseInt(Integer.java:580)
+  	at java.lang.Integer.<init>(Integer.java:867)
+  	at com.meiju.Main.main(Main.java:8)		// 一般双击这一行堆栈描述会自动跳转到代码定位
+  ```
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
