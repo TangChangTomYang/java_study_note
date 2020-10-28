@@ -1,4 +1,4 @@
-#   aeclipse 快捷键
+#    aeclipse 快捷键
 
 - eclipse 中 导 包 的快捷键`ctrl + shift + o` , 也可以用`ctrl + 1` 来修复
 
@@ -472,12 +472,12 @@ int i = (int)d;
   System.out.println(+c); // 此处是 int 类型, 打印为 65
   System.out.println(-c); // 此处是 int 类型, 打印为 -65
   ```
-  
+
   > 这也是我们如何将一个字符转换为数字, 或者如何获取一个字符的ASCII 码值常用的方法(使用一元数字提升即可)
   >
   > 相当于System.out.println((int)c); 的感觉
 
--  示例说明4
+- 示例说明4
 
   ```
   char c1 = 'A';
@@ -774,7 +774,7 @@ int sum(int n){
 ## 1、java程序的内存划分
 
 - `堆` 存储GC所管理的各种对象 (就是我们平时new出来的对象)
--  `方法区`  Method Area, 存储每一个类的结构信息(比如字段和方法信息, 构造方法和普通方法) 
+- `方法区`  Method Area, 存储每一个类的结构信息(比如字段和方法信息, 构造方法和普通方法) 
 - `PC寄存器` Program Counter Register, 存储java虚拟机正在执行的字节码指令地址
 - `Java虚拟机栈` Java Virtual Machine Stack, 存储栈帧(java的方法栈) 
 - `本地方法栈` Native Method Stack, 用来支持native方法调用(比如C语言编写的方法) 
@@ -2070,19 +2070,19 @@ public class OuterClass{
     		
     		Test t = new Test();
     		t.testA(); // 此处调用testA时, 可能外部的局部变量 aa 已经回收了, 所以 testA 内部的aa 需要是有效final的类型 加持
-	}
+    }
     ```
-    
+
     > 其实, 你可以将局部类内部访问的有效 final局部变量理解为在局部类里面有对外面的有效final
     >
     > 有值捕获的意思, 防止外部修改
     >
     > 因为他要考虑到函数调用时堆栈内存回收的问题等等, 所以从这样来理解的话是合理的
-    
+
   - 局部类可以访问外部类里面的成员, 即使被定义为私有
-  
+
     - 局部类只有定义在实例相关的代码块中, 才能直接访问外部类中的实例成员(实例变量, 实例方法)
-  
+
     ```
     package com;
     public class Person{
@@ -2101,9 +2101,9 @@ public class OuterClass{
     		}
     	}
     ```
-  
+
     - 注意: 
-  
+
       ```
       public class Person{
       	private int age;
@@ -2127,7 +2127,7 @@ public class OuterClass{
       	}
       }
       ```
-  
+
 - 局部类举例
 
   ```
@@ -2199,7 +2199,7 @@ public class OuterClass{
 
   >  简单的记, 抽象类就是在普通的类的基础上增加了可以定义抽象方法的功能
   >
-  > 也减少了一个功能, 就是实例化的功能
+  >  也减少了一个功能, 就是实例化的功能
 
   ```
   package com;
@@ -3066,7 +3066,7 @@ class Cat extends Animal{
 
 >  其实, 在java中匿名类通常是 接口的一种高级用法, java中使用匿名类来实现接口的功能比我们单独定义一个类来实现接口中的方法更灵活
 >
-> 这一点, 后面会体会到
+>  这一点, 后面会体会到
 
 - 使用接口定义一个匿名类
 
@@ -3893,7 +3893,7 @@ System.out.println(Arrays.toString(names2));
 如何区分呢? 
 
 -  `类名::静态方法` ,  `::` 右边的方法是静态方法 就是表示的是引用类方法
-- `类名::实例方法` , `::` 右边的方法是实例方法表示的就是 引用特定类型的任意对象的实例方法
+-  `类名::实例方法` , `::` 右边的方法是实例方法表示的就是 引用特定类型的任意对象的实例方法
 
 
 
@@ -4026,7 +4026,7 @@ class Student extends Person{
 - 自定义类实现枚举
 
   > 自定义类实现枚举功能, 有个缺陷就是不能使用switch
-  
+
   ```
   // 自定义类实现 春夏秋冬 枚举
   public class Season{
@@ -4059,9 +4059,9 @@ class Student extends Person{
   			System.out.println("冬天");
   		}
   	}
-}
+  }
   ```
-  
+
   
 
 ## 2、java中枚举的定义
@@ -4384,10 +4384,10 @@ public static void main(String[] args) {
   > ```
   > // equals 方法的定义如下: 
   > public boolean equals(Object obj) {
-  >   if (obj instanceof Integer) {
-  >   	return value == ((Integer)obj).intValue();  // 注意. 右边对obj 进行了强转!
-  >   }
-  >   return false;
+  > if (obj instanceof Integer) {
+  > 	return value == ((Integer)obj).intValue();  // 注意. 右边对obj 进行了强转!
+  > }
+  > return false;
   > }
   > ```
 
@@ -4981,7 +4981,7 @@ String s6 = new String(s5);
     >
     > ​    fastTime = date;
     >
-    >   }
+    > }
     >
     > 比如: new Date(123); 相当于是 获取一个 1970年1月1日 00:00:00 GMT + 123 毫秒的日期
 
@@ -5134,6 +5134,11 @@ String s6 = new String(s5);
 
 # 二一、异常(Exception)
 
+在java开中, 我们对异常的处理主要包含两个方面:
+
+- 一方面是我们在调用方法时, 如果方法内部可能会抛出异常, 我们需要对异常进行处理
+- 另一种是, 我们在封装一个方法时, 如果某处出错, 我们要想方法调用者抛出一个异常供外部处理
+
 
 
 ## 1、开发中的错误
@@ -5259,6 +5264,8 @@ String s6 = new String(s5);
 
 ## 2、try - catch
 
+
+
 ```
 try{
 	// 代码1
@@ -5308,7 +5315,7 @@ catch(异常C e){
 
 
 
-## 3 Throwable 常用方法
+## 3、Throwable 常用方法
 
 ![](images/javaexcption.jpg) 
 
@@ -5343,49 +5350,1803 @@ catch(异常C e){
   	at com.meiju.Main.main(Main.java:8)		// 一般双击这一行堆栈描述会自动跳转到代码定位
   ```
 
+
+
+
+
+## 4、catch 的细节
+
+- 我们在使用 `try{} catch()` 捕获异常时. 其实一个 `catch` 是可以捕获多种类型的异常的
+
+  ```
+  try{
+  
+  }
+  catch(异常A | 异常B | 异常C){
+  	// 当抛出 [异常A] 或 [异常B] 或 [异常C] 类型的异常时, 会进入这个代码块
+  }
+  ```
+
+  > 从java7开始, 单个catch 可以捕获多种类型的异常
+
+- 如果并列的几个异常类型之间存在父子关系, 保留父类型即可
+
+- 这里的变量 e 是隐式 `final` 类型的 (e 的类型不确定时, e 是隐式final 的) 
+
+  > 不论e是不是final 的, 一般我们避免修改e的指向
+
+  ```
+  try{ 
+  }
+  catch(NumberFormatException e ){
+  	e = null; // 当catch 的异常类型是明确的类型时, e 是可以修改的
+  }
+  
+  // 但是, 当 e 的类型是不确定时, e 是final 的, 如下:
+  try{
+  
+  }
+  catch(NumberFormatException | ClassCastException e ){ // 此时e的类型不确定
+  	e = null; // 报错, 此时 e 是隐式final 的, 不允许修改
+  }
+  ```
+
+
+
+**思考下面的代码打印是什么?**
+
+```
+public static void main(String[] args){
+	System.out.println(1);
+	Integer i = new Integer("abc");
+	System.out.println(2); 
+}
+```
+
+
+
+```
+public static void main(String[] args){
+	System.out.println(1);
+	try{
+		System.out.println(2);
+		Integer i = new Integer("abc");
+		System.out.println(3);	// 这句代码没机会执行了
+	}catch (NumberFormatException e){
+		e.printStackTrace();
+		System.out.println(4);
+	}
+	System.out.println(5);
+}
+```
+
+
+
+**经典错误**
+
+```
+Integer[] nums = {11, null, 22};
+for (Integer num : nums) {
+  System.out.println(num);
+}
+// 打印, ok, 如下:
+11
+null
+22
+	
+// 打印报错:   
+Integer[] nums = {11, null, 22};
+for (int num : nums) {
+	System.out.println(num);
+}
+```
+
+
+
+## 5 、打印的细节
+
+- 1. 首先大家都知道, 我们在调用java的 `System.out.println(obj)` 方法时, 其实打印的是 `obj.toString()` 返回的字符串你内容, 即 `obj.toString()` 返回什么字符串, 打印的就是什么
+- 2. 我们知道, 在java里如果一个引用执行的是null 的话, 我们是不能调用它的实例方法的, 会抛异常, 如: `null.xxx()` 是不被允许的
+
+- 3. 下面我们来看一个现象: 
+
+```
+class Dog{
+	@Override
+	public String toString() {
+		return "Dog 666";
+	}
+}
+
+public static void main(String[] args){
+	
+  Dog dog1 = new Dog();
+  System.out.println(dog1);
+
+  Dog dog2 = null;
+  System.out.println(dog2);
+}
+// 打印结果如下:
+Dog 666
+null
+```
+
+> 我们在分析上面的代码的语法是会发现一个很奇怪的结论: 
+>
+> 按道理来说 `System.out.println(dog2);` 会报错, 但是它没有, 这是为什么呢? 
+
+我们经过对源码进行分析发现: 在`System.out.println()` 方法它内部是这样执行了, 有对对象的 null 进行判断, 如下:
+
+```
+// println 方法的定义
+public void println(Object x) {
+  String s = String.valueOf(x);
+  synchronized (this) {
+    print(s);
+    newLine();
+  }
+}
+
+// valueOf方法的定义
+public static String valueOf(Object obj) {
+	return (obj == null) ? "null" : obj.toString();
+}
+```
+
+
+
+## 6、finally 
+
+- **finally 的常见用法如下:** 
+
+  ```
+  // 1. 写法1: try-catch-finally
+  try{ // 可能抛出异常的代码写在这里main
+  
+  }catch(异常 e){ // 需要捕获的异常写在这里面
+  	
+  }finally{// 无论抛不抛异常, 都必须执行的代码写在这里面
+  
+  }
+  
+  // 2. 写法2: try-finally
+  try{ // 可能抛出异常的代码写在这里main
+  
+  }finally{// 无论抛不抛异常, 都必须执行的代码写在这里面
+  
+  }
+  ```
+
+- **finally 的作用**
+
+  - `try` 或 `catch` 正常执行完毕后, 一定会执行`finally` 中的代码
+  - `finaly`  可以和 `try-catch` 配合使用, 也可以只和`try` 搭配使用
+  - 经常会在`finaly` 中编写一些关闭, 释放资源的代码(比如: 关闭文件)
+
+  > - 说白了, finaly 一般和try catch 一起使用, 或单独和 try 一起使用(不能单独使用)
+  >
+  > - 如果 finally 和 try catch 一起使用的话, 一般写在最后一个catch的后面(不能瞎写), 比如:
+  >
+  >   ```
+  >   try{
+  >   }catch(异常 e){
+  >   }catch(异常 e){
+  >   }finally{
+  >   }
+  >   ```
+
+- finally 示例:
+
+  ```
+  PrintWriter out = null;
+  try{
+  	out = new PrintWriter("F:/abc.txt");
+  	out.print("my name is zhangsan);
+  }catch(FileNotFoundException e){
+  	e.printStackTrace();
+  }finally{
+  	if(out != null){
+  		out.close();	// 关闭文件
+  	}
+  }
+  ```
+
+- finally 细节
+
+  - 如果在执行`try` 或者 `catch` 时, JVM 退出或者当前线程被中断、杀死,  `finally` 可能不会被执行
+
+  - 如果`try` 或者`catch` 中使用了 `return`、 `break` 、`continue` 等提前结束语句, `finally` 会在`return`、`break`、`continue` 之前执行
+
+  - 看下代码的执行情况:
+
+    ```
+    // 示例1: 
+    try {
+    	System.out.println(1);
+    	return ;	// 虽然这里有return 但是后面的finally 依然会执行
+    }finally {
+    	System.out.println(2);
+    }
+    // 打印结果:
+    1
+    2
+    
+    
+    // 示例2:
+    for(int i=0; i < 4; i++) {
+      try {
+        System.out.println("try1: " + i);
+        if(i == 2) continue;		// 虽然i==2这轮循环continue了 但finaly 依然会执行
+        System.out.println("try2: " + i);
+      }finally {
+        System.out.println("finally: " + i);
+      }
+    }
+    // 打印结果:
+    try1: 0
+    try2: 0
+    finally: 0
+    try1: 1
+    try2: 1
+    finally: 1
+    try1: 2
+    finally: 2					// 当为2时, finally 依然执行了
+    try1: 3
+    try2: 3
+    finally: 3
+    
+    
+    // 示例3:
+    for(int i=0; i < 4; i++) {
+      try {
+        System.out.println("try1: " + i);
+        if(i == 2) break;		// 虽然这轮循环 break了, 但是finally 依然会执行
+        System.out.println("try2: " + i);
+      }finally {
+        System.out.println("finally: " + i);
+      }
+    }
+    // 打印结果:
+    try1: 0
+    try2: 0
+    finally: 0
+    try1: 1
+    try2: 1
+    finally: 1
+    try1: 2
+    finally: 2		// finally 依然执行了
+    
+    // 示例4:
+    public static void main(String[] args){
+      System.out.println(get());
+    
+    }
+    
+    static int get() {
+      try {
+        new Integer("abc");
+        System.out.println(1);
+        return 2;		
+      }catch (Exception e) {
+        System.out.println(3);
+        return 4;
+      }finally {
+        System.out.println(5);
+      }
+    }
+    // 打印结果:
+    3
+    5
+    4
+    ```
+
+    **结论: ** 
+
+    > finally 会在 `break`、`continue` 、`return` 执行之前执行
+
+
+
+## 7、throws
+
+### 1、throws 的使用体验
+
+**throws  的作用: 将异常抛给上层方法, 当前方法不对异常做处理** 
+
+我们在java开发中, 通常会有两种方式处理异常: **try-catch-finally 和 throus** , 使用**try-catch-finally** 是直接捕获在当前方法中抛出的异常, 而使用**throws** 是将当前方法中出现的异常抛给外层方法, 当前方法不处理, 下面我们就来看下**throws** 的用户
+
+```
+// 使用try catch 的写法, 在当前方法内处理异常
+static void test() {
+  System.out.println(1);
+  try {
+    Class cls = Class.forName("Dog");
+  } catch (ClassNotFoundException e) {	// 处理捕获到的异常
+    e.printStackTrace();
+  } 
+  System.out.println(2);
+}
+
+// 使用throws 将当前方法内抛出的异常, 抛出去
+static void test() throws ClassNotFoundException {
+  System.out.println(1);
+  Class cls = Class.forName("Dog");
+  System.out.println(2);
+}
+```
+
+
+
+### 2、throws 的流程
+
+- 示例代码 
+
+  ```
+  public static void main(String[] args)   throws ClassNotFoundException {
+  		System.out.println(1);
+  		method1();
+  		System.out.println(2);
+  	}
+  	
+  	static void method1()  throws ClassNotFoundException{
+  		method2();
+  	}
+  	static void method2()  throws ClassNotFoundException{
+  		method3();
+  	}
+  	static void method3() throws ClassNotFoundException {
+  		Class cls = Class.forName("abc");
+  	}
+  ```
+
+  - 示例流程分析
+
+  ![Snip20201026_2](images/Snip20201026_2.png) 
+
+  - 实例流程说明:
+
+    从上面的代码和流程图我们可以发现, 当内层方法中执行的代码出现异常后, 我们是可以使用**throws** 关键字将对应的异常一层层的往外层方法抛的 (我们可以把throws 异常理解成 甩锅, 当你不想背锅时就使用throws 甩出去), 如果外层方法都不处理, 最后异常就会来到**JVM** 最终程序终止. 
+
+
+
+### 3、throws 抛异常细节1
+
+- 当我们的方法内可能会出现多个异常时, 我们可以使用 **throws** 抛出多个异常, 也可以抛出部分异常, 亦可以抛出异常的父类, 如下: 
+
+  ```
+  // 1. 抛出多个异常, 不同异常使用 , 分隔
+  static void method3() throws ClassNotFoundException, FileNotFoundException {
+    Class cls = Class.forName("abc");
+    PrintWriter out = new PrintWriter("C:/abc.mp3");
+  }
+  
+  // 2. 因为 ClassNotFoundException 和 FileNotFoundException 的公共父类是 Exception
+  // 因此我们也可以抛出公共父类异常
+  static void method3() throws Exception {
+    Class cls = Class.forName("abc");
+    PrintWriter out = new PrintWriter("C:/abc.mp3");
+  }
+  
+  // 3. 也可以处理部分异常, 抛出部分异常
+  static void method3() throws ClassNotFoundException{
+    Class cls = Class.forName("abc");
+    try {
+      PrintWriter out = new PrintWriter("C:/abc.mp3");
+    } catch (FileNotFoundException e) {
+  
+      e.printStackTrace();
+    }
+  }
+  ```
+
+  > 在实际开发中, 我们一般是希望对异常描述的越清楚越好, 这样便于我们程序出问题后检查,  因此我们不推荐使用抛出公共异常父类的做法
+
+
+
+
+
+### 4、throws 抛异常细节2
+
+- 当父类的方法没有**throws** 抛异常时, 子类继承父类且重写父类的方法时, 之类的方法也不能使用**throws** 抛出异常. 
+
+  ```
+  class Person{
+  	public void test() {
+  		System.out.println("person test");
+  	}
+  } 
+  
+  class Student extends Person{
+  	@Override
+  	// public void test() throws  Exception { // 错误, 父类没有throws , 子类重写也不能有throws
+    public void test()  { 
+  		super.test();
+  		System.out.println("student test");
+  	}
+  }
+  ```
+
+  
+
+- 如果父类的方法有**throws** 异常, 子类重写的方法可以**不throws** 异常(子类自己消化掉了) , 也可以子类和父类**throws** 相同的异常, 也可以子类**throws** 出父类异常的子类型
+
+  - 子类重写父类的`throws` 方法, 子类不`throws` 异常, 自己消化掉
+
+    ```
+    class Person{
+    	public void test() throws Exception {}
+    } 
+    
+    class Student extends Person{
+    	@Override
+    	public void test()  { 
+    		 // 内部, 消化掉 父类的异常
+    	}
+    }
+    ```
+
+  - 子类重写父类的有`throws` 的方法时, 抛出和父类想同的异常
+
+    ```
+    class Person{
+    	public void test() throws Exception { }
+    } 
+    
+    class Student extends Person{
+    	@Override
+    	public void test() throws Exception { }
+    }
+    ```
+
+  - 子类重写父类的`throws` 方法, 抛出父类异常的子类, 也是可以的
+
+    ```
+    class Person{
+    	public void test() throws Exception {}
+    } 
+    
+    class Student extends Person{
+    	@Override
+    	public void test() throws XXXException {} // Exception 的子类
+    }
+    ```
+
+
+
+### 5、throws 抛异常细节3
+
+当我们抛出的是检查性异常时, 如果我们没有对异常进行处理( try-catch 或 throws) , 编译器将报错, 提示我们必须处理, 但是当抛出的是非检查性异常(比如: RuntimeException) 时, 如果我们不处理, 编译器不会报错, 示例如下:
+
+- 检查性异常, 必须处理
+
+  ```
+  void test1(){
+  	test2();		// error , 必须处理异常
+  }
+  
+  void test2() throws Exception{
+  }
+  ```
+
+- 非检查性异常, 可以不处理
+
+  ```
+  public static void main(String[] args)    {
+  	test2();	// 可以不处理, 不抛错
+  } 
+  	static void test2() throws RuntimeException{
+  }
+  ```
+
+  
+
+## 8、throw 不是 throws
+
+>  注意: 我们此处说的**throw** 不是前面说的 **throws** 
+
+### 1、throw 的简单使用
+
+我们前面介绍的异常处理都是我们们在调用API时(方法)时方法内部抛给我们的,要我们处理的.  但是有时我们在封装API(方法)时想告诉别人某个参数不满足条件, 想抛出一个异常给调用者时我们需要怎么做呢?  这时, 我们就需要用到 **throw** , 创建一个自定你以异常(错误) , 外部就可以使用 **try-catch 或者 throws** 来处理了
+
+- 使用**throw** 可以抛出一个新建的异常(我们自定义的异常) 
+
+  ```
+  //定义一个方法, 内部可以抛出自定义的 异常
+  void setAge(int age) throws Exception{ // 将自定义的异常抛出
+  	if(age <= 0){
+  		// 抛出自定义异常
+  		throw new Exception("age 必须是>0 的int");
+  	}
+  	this.age = age;
+  }
+  
+  // 外部调用
+  void test(){
+  	try{
+  		setAge(10);
+  	}
+  	catch(IllegalArgumentException e){
+  		e.printStackTrace();
+  	}
+  }
+  ```
+
+  > 注意: 当我们在方法内使用了 throw 抛出了自定义的异常后, 一定要使用 throws 将异常抛出去, 否则throw 将毫无意义(如果你使用了 throw 而 没有使用 throws 就像是你发现了异常但是没有上报, 你不上报外面怎么会知道有错呢?)
+
+
+
+**简单的说:**  
+
+当我们在调用方法时, 如果方法内部可能抛出异常, 此时我们可以使用`try-catch` 或者 `throws` 的方式来处理接收到的异常.
+
+当我们在封装一个方法供外部使用时, 如果在某种条件下需要将一个错误抛给外部让外部调用者来对这种错误异常进行处理时, 这时我们就可以使用 `throw` 来抛出一个异常 (注意: throw 和 throws 通常是一起使用的) 
+
+
+
+### 2、throw 的细节
+
+- 通过 **throw**  抛出的检查性异常, 必须通过 **try-catch 或 这 throws** 处理,如下示例:
+
+  ```
+  public class Person{
+  	public Person(String name) throws Exception{	
+  		if(name == null || name.length() == 0){
+  			throw new Exception("name 不能为空");
+  		}
+  	}
+  }
+  // 因为Exception 是检查性异常, 必须处理
+  ```
+
+  
+
+- 通过 **throw** 抛出的非检查性异常, 可以不处理(即 可以不用try-catch 或 throws 处理)
+
+  **IllegalArgumentException 非法参数异常, 这平时用的多** 
+
+  ```
+  public class Person{
+  	public Person(String name){	
+  		if(name == null || name.length() == 0){
+  			throw new IllegalArgumentException("name 不能为空");
+  		}
+  	}
+  }
+  // 因为IllegalArgumentException 是 非检查性异常, 可以不处理
+  ```
+
+
+
+从上面的示例我们发现一个问题, 我们使用 **throw 抛出一个检查性异常外部必须额外写代码处理, 使用throw 抛出的是一个非检查性异常(比如: 运行时异常)外部不需要额外写代码处理** , 既然抛出检查性异常和非检查性异常都可以, 那么我们在真实的开发中怎么来选择呢? 我们一般面对选择都是有选择困难症的
+
+是这样的哈!
+
+- 当我们抛出的是检查性异常的话, 外部在调用我们的方法时, 必须额外写代码对异常做处理, 代码书写的肯定要复杂一些, 可读性肯定会降低. 
+- 如果我们抛出的是非检查性异常, 外部使用时没有增加代码的复杂性
+- 因此我们的结论和处理方式, 通常是这样的:
+  - 如果你觉得这个异常是很重要的, 必须引起外部的注意, 那么就抛出检查性异常, 明确告诉外面需要额外的处理可能发出的异常, 外部必须引起重视
+  - 如果你觉得这个异常仅仅是一个警告, 只是在某种条件下给出错误提示, 那么就使用非检查性异常, 这样对外部来说不增加额外的代码成本. 
+
+
+
+
+
+
+
+## 9、自定义异常
+
+前面我们通过 **throw** 出去的异常都是系统提供的异常类型, 但是在实际的开发中, 系统提供的异常可能是不能满足我们的需求的, 这时就需要我们自定义异常了.
+
+在java开发中, 自定义的异常类型, 基本都是以下2种做法:
+
+- 要么继承自 **Exception**
+  - 使用起来代码稍微复杂点
+  - 希望开发者重视这个异常, 认真处理这个异常
+  - 就是我们前面一直在提的 检查性异常
+- 要么继承自 **RuntimeException**
+  - 使用起来代码更加简洁
+  - 不严格要求开发者去处理这个异常
+  - 这个就是我们一直在说的 运行时异
+
+
+
+**自定义异常的优点:**
+
+1. 因为有时, 我们使用系统提供的异常类型不能很全面的满足我们要想表达的思想, 使用自定义异常更灵活, 更接地气
+2. 因为自定义异常是我们自己实现的异常类型, 因此在很多地方能更方便更灵活, 更见名知意
+
+
+
+```
+// 自定义 检查性异常
+public EmptyStringException extends Exception{
+	public EmptyStringException(String name){
+		super(name + "的长度不能为空");
+	}
+}
+
+// 运行时异常
+public NumberException extends RuntimeException{
+	public NumberException(String name){
+		super(name + "取值必须>=0");
+	}
+}
+```
+
+
+
+## 10、总结
+
+- 不论事 **检查性异常, 非检查性异常, 只要是继承自Throwable** 我们都可以使用 **try-catch 或者 throws** 来处理
+- 只是, 如果你是非检查性异常,  **try-catch 或者 throws** 不是强制的
+- 不论是什么异异常, 只要最终传递到了 JVM 中, 都会导致程序终止
+
+
+
+- 其实我们在开发中, 也有个误区: 是不是程序中有抛出异常就是程序员代码写的不好呢? 
+  - 其实不是的, 比如检查性异常是难以避免的(比如: 要读取一个文件, 文件真实就是不存在), 因此编译器强制要求你去检查. ( 比如: 通过一个名字去获取一个类, 外部传参是难以避免的)
+
+
+
+## 11、使用异常的好处
+
+- 将错误代码与普通代码区分开
+- 能将错误信息传递到调用栈中
+- 能对错误信息进行分组
+
+
+
+## 12 、编写一个断言类
+
+```
+public class Assert{
+	public static void test(boolean v){
+		if(v) return;
+		throw new IllegalArgumentException("条件不成立");
+	}
+}
+
+// 使用断言类测试代码
+public static void main(String[] args)    {
+		int age = 10;
+		Assert.test(age > 10);
+
+		String name = "";
+		Assert.test(name != null && name.length() != 0);
+	}
+
+// 打印:
+Exception in thread "main" java.lang.IllegalArgumentException: 条件不成立
+	at com.meiju.Assert.test(Main.java:28)
+	at com.meiju.Main.main(Main.java:14)
+```
+
+
+
+# 二二、正则表达式
+
+
+
+## 1、字符串的合法验证
+
+- 在开发中, 我们经常会对一些字符串进行合法验证, 如下:
+
+  ![Snip20201026_3](images/Snip20201026_3.png) 
+
+- 自己实现一个代码的验证
+
+  ```
+  // 自己实现一个email 的判断规则
+  // 6~18个字符, 可使用字母, 数字, 下划线, 需以字母开头
+  public static boolean validate(String email) {
+  
+  
+    // 在java中获取指定位置的字符 email.charAt(1);
+    // 获取字符数组 char[] chars = email.toCharArray();
+    if (email == null) {
+      return false;
+    }
+  
+    char[] chars  = email.toCharArray();
+    if (chars.length < 6 || chars.length > 18) {
+      return false;
+    }
+    if (! isLetter(chars[0])) {
+      return false;
+    }
+  
+    for(int i = 1; i < chars.length; i++) {
+      char c = chars[i];
+      if (isLetter(c) || isDigit(c) || c == '-') {
+        return true;
+      }
+    } 
+    return false;
+  }
+  
+  private static  boolean isLetter(char c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <='z');
+  }
+  
+  private static boolean isDigit(char c) {
+    return (c >= '0' && c <= '9') ;
+  }
+  ```
+
+> 使用:
+>
+> ```
+> public static void main(String[] args) {
+>   System.out.println(validate("qqq333wewe"));
+> }
+> ```
+
+
+
+- 我们刚才用自定义的方式写了一个规则来判断, 发现是如此的复杂,下面我们使用正则表达式来实现相同的功能, 如下:
+
+  ```
+  // 使用正则来判断 
+  String regex  = "[a-zA-Z][a-zA-z0-9]{5,17}";
+  System.out.println("qqq333wewe".matches(regex));
+  
+  // 也可以这样写
+  String regex  = "[a-zA-Z]\\w{5,17}";  // \w 字母数字下划线
+  System.out.println("qqq333wewe".matches(regex));
+  ```
+
+  > 正则表达式, 可以使用一段非常精简的表达式取代复杂的逻辑验证
+  >
+  > 极大的提高了我们的开发效率
+
+正则表达式是一门通用的技术, 适用于绝大多数流行的编程语言
+
+比如, 刚才的正则表达式完全可以使用在javaScript中, 如下: 
+
+```
+// 在javaScript 中使用正则
+const regex = /[a-zA-Z]\w{5,17}/;
+console.log(regex.test("qqq333wewe"));
+```
+
+
+
+## 2、单字符匹配
+
+> 单字符匹配, 一个 `[]` 中只匹配一个字符
+
+| 语法            | 含义                                                 |
+| --------------- | ---------------------------------------------------- |
+| `[abc]`         | a、b、c                                              |
+| `[^abc]`        | 除了a、b、c以外的任何字符                            |
+| `[a-zA-Z]`      | 从a到z、从A到Z                                       |
+| `[a-d[m-p]]`    | [a-dm-p]  并集,即`[a-d[m-p]]` 与 `[a-dm-p]` 完全等价 |
+| `[a-z&&[def]]`  | d、e、f  交集                                        |
+| `[a-z&&[^bc]]`  | [ad-z] 差集, 从[a-z]中减去[bc]                       |
+| `[a-z&&[^m-p]]` | [a-lq-z] 差集, 从a-z中减去[m-p]                      |
+
+> 示例:
+>
+> `[bcr]at` 第一个字符是 b 或 c 或r, 第二个是a, 第三个时 t
+>
+> 也可以这样写: `[b|c|r]at` 
+>
+> 还可以这样写: `(b|c|r)at` , 注意: 使用这种小括号`()` 中间就必须有`|` , 如果使用`[]` 那么中竖线`|` 可以省略
+
+
+
+## 3、预定义字符
+
+### 1、预定义字符的介绍与使用
+
+| 语法 | 含义                                                        |
+| ---- | ----------------------------------------------------------- |
+| `.`  | 任意字符                                                    |
+| `\d` | [0-9] 数字                                                  |
+| `\D` | `[^0-9]`  非数字                                            |
+| `\s` | `[ \t\n\f\r]` 空白(注意 \t 前面有个空格哈), tab键 回车 换行 |
+| `\S` | `[^\s]` 非空白                                              |
+| `\w` | [a-zA-Z0-9_] 单词 (字母 数字 下划线)                        |
+| `\W` | `[^\w]`  非单词                                             |
+
+> 以 1个反斜杠`\` 开头的字符会被当做转义字符处理
+>
+> 因此:
+>
+> 为了能在正则表达式中完整的表示预定义字符, 在java中需要用2个反斜杠`\\`开头, 比如:
+>
+> `\\t`  或 `\\d`   
+
+```
+比如: 我们想要匹配任意字符, 可以这样能写
+String regex = ".";
+String str = "a";
+System.out.println(str.matches(regex)); // true
+
+// 如果指向匹配一个 `.` 那么需要使用 `\\.` 来表示
+String regex2 = "\\.";		// 判断一个点
+String str2 = "a";
+String str3 = ".";
+System.out.println(str2.matches(regex2)); // true
+System.out.println(str3.matches(regex2)); // true
+```
+
+
+
+### 2、预定义字符的细节
+
+- `.` 在正则表达式中是属于预定义字符, 如果想要判断单独的 `.` ,而不是全部的字符, 我们需要使用`\\.` , 这个细节在开发中容易犯, 要注意!!! 
+
+  - 比如我们要判断 `.java` 要怎么写呢? 
+
+    ```
+    String regex = ".java"; // 表示第一个字母是任意的, 后面是java
+    System.out.println(".java".matches(regex)); // true
+    System.out.println("ajava".matches(regex)); // true
+    System.out.println("bjava".matches(regex)); // true
+    System.out.println("xjava".matches(regex)); // true
+    
+    如果我们要判断的就是 点java , 我们要怎么写呢? 按照下面的写
+    string regex2 = "\\.java";
+    System.out.println(".java".matches(regex)); // true
+    System.out.println("ajava".matches(regex)); // false
+    ```
+
+  - 比如: 我们需要判断 `[`  `]`  又要怎么写呢? 
+
+    一样的, 因为在java中单个`[` 或这 `]` 是有特殊含义的, 我们要这样写 `\\[`  或者 `\\]` 
+
+  - 同样的, 判断 `{` `}`  , 需要写成: `\\{`  或 `\\}` 
+
+  - 判断`^` , 需要写成 `\\^` 
+
+  
+
+## 4、量词 (贪婪、勉强、独占)
+
+
+
+| 贪婪(Greedy) | 勉强(reluctant) | 独占(Possessive) | 含义                 |
+| ------------ | --------------- | ---------------- | -------------------- |
+| X{n}         | X{n}?           | X{n}+            | X 出现n次            |
+| X{n,m}       | X{n,m}?         | x{n,m}+          | X 出现n到m次         |
+| X{n,}        | X{n,}?          | X{n,}+           | X 出现至少n次        |
+| X?           | X??             | X?+              | X{0,1} X出现0次或1次 |
+| X*           | X*?             | X*+              | X{0,} X出现任意次    |
+| X+           | X+?             | X++              | X{1,} X至少出现1次   |
+
+> 可以将贪婪理解为, 先整口吞,不满足再从右往左一个个丢, 再一起吞再判断, 依次往复
+
+- 示例:
+
+  ```
+  String regex = "6{3}"; // 6出现3次
+  "66".matches(regex); // false
+  "666".matches(regex); // true
+  "6666".matches(regex); // false
+  
+  String regex2 = "6{2,4}"; // 6出现2到4次
+  "6".matches(regex2); // false
+  "66".matches(regex2); // true
+  "666".matches(regex2); // true
+  "6666".matches(regex2); // true
+  "66666".matches(regex2); // false
+  
+  String regex3 = "6{2,}";	// 6 至少出现2次
+  "6".matches(regex3); // false
+  "66".matches(regex3); // true
+  "666".matches(regex3); // true
+  "6666".matches(regex3); // true
+  "66666".matches(regex3); // false
+  
+  
+  String regex4 = "6?";	// 6 出现1次 或0次
+  "".matches(regex4); // true
+  "6".matches(regex4); // true
+  "66".matches(regex4); // false
+  
+  
+  String regex5 = "6*";	// 6 出现任意次
+  "".matches(regex5); // true
+  "6".matches(regex5); // true
+  "66".matches(regex5); // false
+  
+  String regex5 = "6+";	// 6 至少出现1次
+  "".matches(regex5); // false
+  "6".matches(regex5); // true
+  "66".matches(regex5); // true
+  ```
+
+  
+
+## 5、Pattern 、 Matcher
+
+### 1、String的matches 方法底层实现
+
+- String 的matches方法底层用到了 Pattern、 Matcher 两个类, 如下:
+
+  ```
+  // java.lang.String 中的matches 定义如下:
+  public boolean matches(String regex){
+  	return Pattern.matches(regex, this);
+  }
+  
+  // java.lang.regex.Pattern 中的matches 方法定义如下:
+  public static boolean matches(String regex, CharSequence input){
+  	Pattern p = Pattern.compile(regex);
+  	Matcher m = p.matcher(input);
+  	return m.matches();
+  }
+  ```
+
+  > 换句话说, 当我们调用String的matches 方法时, 其实内部是调用了Pattern的matches 方法
+
+### 2、Matcher 常用方法
+
+- 常用方法介绍
+
+  ```
+  // 如果整个input 与 regex 匹配, 就返回 true
+  public boolean matches();
+  
+  // 如果从 input 中找到了与 regex 匹配的子序列, 就返回true
+  // 如果匹配成功, 可以通过 start、end、group 方法获取更多信息
+  // 每次的查找范围会先剔除此前已经查找过的范围
+  public boolean find()
+  
+  // 返回上一次匹配成功的开始索引
+  public int start();
+  
+  // 返回上一次匹配成功的结束索引
+  public int end();
+  
+  // 返回上一次匹配成功的 input 子序列
+  public String group();
+  ```
+
+- 示例1, 找出所有满足条件的子串
+
+  ```
+  String input = "123_444_555_666_789";
+  String regex = "\\d{3}"; 		// 找3个数字
+  
+  Pattern p = Pattern.compile(regex);
+  Matcher m = p.matcher(input); 
+    while (m.find()) { // 检查满足条件的子串
+      
+    System.out.println(m.group()); 	// 获取匹配的子串
+    // 获取匹配子串的开始位置
+    System.out.println(m.start());  // [0, 3) 左闭右开
+    // 获取匹配子串的结束位置
+    System.out.println(m.end()); 	// [0, 3) 左闭右开
+  }
+  // 打印:
+  123
+  0
+  3
+  444
+  4
+  7
+  555
+  8
+  11
+  666
+  12
+  15
+  789
+  16
+  19
+  ```
+
+  > 1. System.out.println(input.matches(regex)); // false, matches 要求完全匹配
+  > 2. m.matches() 也是要求完全匹配
+  > 3. m.find() 调用一次, 就只匹配一个只串
+
+  
+
+### 3、正则工具封装1(matcher 工具封装)
+
+```
+public static void findAll(String regex, String input){
+	if(regex == null || input == null) return;
+	
+	Pattern p = Pattern.compile(regex);
+	Matcher m = p.matcher(input);
+	boolean found = false;
+	while(m.find()){
+		found = true;
+		System.out.format("\"%s\", [%d, %d] %n", m.group(), m.start(), m.end());
+	}
+	if(!found){
+		System.out.println("not found");
+	}
+}
+```
+
+- 示例1:
+
+  ```
+  String regex = "123";	
+  String input = "123";
+  findAll(regex, input);
+  // 打印:
+  "123", [0, 3] 
+  
+  String regex2 = "123";	
+  String input2 = "6_123_123_7";
+  findAll(regex2, input2);
+  // 打印:
+  "123", [2, 5] 
+  "123", [6, 9] 
+  
+  String regex3 = "[abc]{3}";	
+  String input3 = "abcaaabbbcccbac";
+  findAll(regex3, input3);
+  // 打印:
+  "abc", [0, 3] 
+  "aaa", [3, 6] 
+  "bbb", [6, 9] 
+  "ccc", [9, 12] 
+  "bac", [12, 15]
+  
+  String regex4 = "\\d{2}";	
+  String input4 = "0_21_345_67_8";
+  findAll(regex4, input4);
+  // 打印:
+  "21", [2, 4] 
+  "34", [5, 7] 
+  "67", [9, 11] 
+  ```
+
+- 示例2:
+
+  ```
+  String input = "";
+  findAll("a?", input);
+  // 打印:
+  "", [0, 0] 
+  
+  String input2 = "";
+  findAll("a*", input2);
+  // 打印:
+  "", [0, 0]
+  
+  String input3 = "";
+  findAll("a+", input3);
+  // 打印:
+  not found
+  ```
+
+- 示例3:
+
+  ```
+  String input = "a";
+  findAll("a?", input);
+  // 打印:
+  "a", [0, 1] 
+  "", [1, 1] 
+  
+  String input2 = "a";
+  findAll("a*", input2);
+  // 打印:
+  "a", [0, 1] 
+  "", [1, 1] 
+  
+  String input3 = "a";
+  findAll("a+", input3);
+  // 打印:
+  "a", [0, 1] 
+  ```
+
+- 示例4:
+
+  ```
+  String input = "abbaaa";
+  findAll("a?", input);
+  // 打印:
+  "a", [0, 1] 
+  "", [1, 1] 
+  "", [2, 2] 
+  "a", [3, 4] 
+  "a", [4, 5] 
+  "a", [5, 6] 
+  "", [6, 6] 
+  
+  String input2 = "abbaaa";
+  findAll("a*", input2);
+  // 打印:
+  "a", [0, 1] 
+  "", [1, 1] 
+  "", [2, 2] 
+  "aaa", [3, 6] 
+  "", [6, 6] 
+  
+  String input3 = "abbaaa";
+  findAll("a+", input3);
+  // 打印:
+  "a", [0, 1] 
+  "aaa", [3, 6] 
+  ```
+
+
+
+
+### 4、正则工具封装2(matcher 工具封装)
+
+```
+// flag 表示的是正则的模式, 后面会讲
+public static void findAllf(String regex, String input, int flag){
+		if(regex == null || input == null) return;
+		
+		Pattern p = Pattern.compile(regex, flag);
+		Matcher m = p.matcher(input);
+		boolean found = false;
+		while(m.find()){
+			found = true;
+			System.out.format("\"%s\", [%d, %d] %n", m.group(), m.start(), m.end());
+		}
+		if(!found){
+			System.out.println("not found");
+		}
+	}
+```
+
+
+
+
+
+ ## 6、Matcher 贪婪、勉强、独占的区别 !!!
+
+| 贪婪(Greedy) | 勉强(reluctant) | 独占(Possessive) | 含义                 |
+| ------------ | --------------- | ---------------- | -------------------- |
+| X{n}         | X{n}?           | X{n}+            | X 出现n次            |
+| X{n,m}       | X{n,m}?         | x{n,m}+          | X 出现n到m次         |
+| X{n,}        | X{n,}?          | X{n,}+           | X 出现至少n次        |
+| X?           | X??             | X?+              | X{0,1} X出现0次或1次 |
+| X*           | X*?             | X*+              | X{0,} X出现任意次    |
+| X+           | X+?             | X++              | X{1,} X至少出现1次   |
+
+- **贪婪** (很贪, 越长越好)
+
+  - 先吞掉整个 **input** 进行匹配
+    - 若匹配失败, 则吐出最后一个字符
+  - 然后再尝试匹配, 重复此过程, 直到匹配成功
+
+  > 贪婪是从右往左缩, 只要满足条件就不缩了
+  >
+  > 贪婪模式也可能会匹配多次
+
+  ```
+  String input = "afooaaaaaafooa";
+  findAll(".*foo", input); // 贪婪
+  // 打印:
+  "afooaaaaaafoo", [0, 13] 
+  
+  //贪婪模式也可能会匹配多次 (这也是贪婪模式)
+  findAll("d+","ddd_dddd_ddddd");
+  // 打印
+  "ddd", [0, 3] 		
+  "dddd", [4, 8] 
+  "ddddd", [9, 14] 
+  ```
+
+- **勉强**
+
+  - 先吞掉**input** 的第一个字符进行匹配
+    - 若匹配失败, 再吞掉下一个字符
+  - 然后再尝试匹配, 重复此过程, 直到匹配成功
+
+  > 从左往右扩展, 满足条件就不扩了
+
+  ```
+  String input = "afooaaaaaafooa";
+  findAll(".*?foo", input);
+  // 打印:
+  "afoo", [0, 4] 
+  "aaaaaafoo", [4, 13] 
+  ```
+
+- **独占**
+
+  - 先吞掉整个 **input** 进行唯一的一次匹配
+
+  ```
+  String input = "afooaaaaaafooa";
+  findAll(".*+foo", input);
+  // 打印:
+  not found
+  ```
+
+
+> 因为Matcher 会匹配每一个分组, 因此你可以理解为已经被匹配的部分会被切除掉, 不会在进行到下一轮匹配中.
+
+## 7、捕获组
+
+所谓捕获组, 就是下面带小括号`()` 这种
+
+```
+String regex = "dog{3}";
+"doggg".matches(regex); // true
+
+// 使用 [] 括起来, 表示一个字符, 取其中一个
+String regex2 = "[dog]{3}";
+"ddd".matches(regex2); // true
+"ooo".matches(regex2); // true
+"ggg".matches(regex2); // true
+"dog".matches(regex2); // true
+"gog".matches(regex2); // true
+"gdo".matches(regex2); // true
+... 
+
+// 使用 () 括起来表示是一个组, 是一个整体, 必须一起出现
+String regex3 = "(dog){3}";
+"dogdogdog".matches(regex3); // true
+```
+
+> 注意:
+>
+> 如果在捕获中中出现了竖线`|` 含义又不一样了, 表示是或
+>
+> `(a|b|c)` 等价于[abc]
+
+
+
+## 8、捕获组-反向引用(backreference) 待看
+
+### 1、反向引用的简单使用
+
+- 反向引用(backreference)
+
+  - 可以使用**反写干(`\`) + 组编号(从1开始)** 来引用组的内容
+  - 注意: 反向引用, 引用的是内容作为规则
+
+  ```
+  String regex = "(\\d\\d)\\1";
+  "1212".matches(regex); // true
+  "1234".matches(regex); // false
+  ```
+
+  > **说明**:
+  >
+  > - 一对小括号`()` 表示一个组, 如果我们这么写: `(a)(b)(c)` 代表3个组, 分别是第一组`(a)` , 第二组`(b)` , 第三组`(c)`
+  > - `(\\d\\d)` 表示必须出现2个数字, 表示的是一组
+  > - `(\\d\\d)\\1` 中的`\\1` 表示获取1号组的内容,相当于1号组的内容再重复一次(即, 相当于`(\\d\\d)(\\d\\d)` , 注意此处是相当于, 不是等于.
+
+  ```
+  String regex = "([a-z]{2})([A-Z{2})\\2\\1";
+  "mjPKPKmj".matches(regex); // true
+  "mjpkmjpk".matches(regex); // false
+  // 从这个示例, 就可以看到引用
+  ```
+
+  > - `([a-z]{2})([A-Z]{2})\\2\\1` 中的第一组是`([a-z]{2})` , 第二组是`([A-Z]{2})`
+  > - `([a-z]{2})([A-Z]{2})\\2\\1` 有点像等价于 `([a-z]{2})([A-Z]{2})([a-z]{2})([A-Z]{2})` 但是又不相等
+
+
+
+### 2、捕获组-反向引用, 详细说明
+
+前面已经介绍了捕获组反向组引用, 下面我们来详细说明一下, 我们在实际开发中怎么来确认引用的是那一部分呢?
+
+- 一般来说, 我们是通过检查正则表达式中有几个成对的小括号`()` 来判断有几个捕获组的.(或者我们可以数一下有几个左括号`(` 就有几个捕获组)
+
+  如下: 表达式中一共有4个捕获组
+
+  ```
+  ((A)(B(C)))
+  ```
+
+- 一般, 我们是从正则表达式的左边的第一个左括号`(`开始往右边数, 一个左括号`(` 就是一个捕获组
+
+  ```
+  ((A)(B(C)))
+  // 一共4个组
+  // 第1组: ((A)(B(C)))
+  // 第2组: (A)
+  // 第3组: (B(C))
+  // 第4组: (C)
+  ```
+
+  > 一般来说正则表达式中的小括号`(` 是成对出现的
+
+  ```
+  String regex = "((I)( Love( You)))\\3{2}";
+  "I Love You Love You Love You".matches(regex);	// true
+  ```
+
+### 3、捕获组- 实用功能
+
+- 实用捕获组, 获取捕获到的指定内容
+
+  > 先通过正则表达式匹配出所有的满足条件的子串, 在使用捕获组再获取到其中的某个组功能
+
+  ```
+  利用捕获组, 获取捕获组中的内容
+  // 我们要获取 小写-数字-大写 中间的数字 
+  String regex = "[a-z]+-([0-9]+)-[A-Z]+";
+  Pattern p = Pattern.compile(regex);
+  String input = "12-12a-10-ZZ-bb-20-cc-ee-19-ZZ-cc";
+  Matcher m = p.matcher(input);
+  boolean find = false;
+  while(m.find()) {
+    System.out.format("%s ==> %s\n", m.group(), m.group(1));
+    find = true;
+  }
+  if (!find) {
+    System.out.println("没找到");
+  }
+  
+  // 打印:
+  a-10-ZZ ==> 10
+  ee-19-ZZ ==> 19
+  ```
+
+- 应用场景2, 找出所有的文件名
+
+  ```
+  比如我们有这样的文件名, 如下: 要获取中间的xxxx 文件名
+  {
+  01xxxxx.mp3
+  02xxxxx.Mp3
+  03xxxxx.mP3
+  ... ... 
+  999xxxxx.MP3
+  }
+  
+  String regex = "[0-9]*(\\w+).[mM][pP]3"; 
+  Pattern p = Pattern.compile(regex);
+  String input = "1024xxMP3xxx.MP3"; // 其中一个
+  Matcher m = p.matcher(input);
+  while(m.find()){
+    System.out.println(m.group());
+    System.out.println(m.group(1)); // 文件名
+  }
+  
+  // 打印:
+  1024xxMP3xxx.MP3
+  xxMP3xxx
+  ```
+
   
 
 
 
+## 9、边界匹配符(boundary Matcher)
+
+### 1、边界匹配
+
+- 我们仔细分析一个字符串发现有下面这些特点:
+  - 一个字符串有若干个字符组成, 而字符又可以分成: 小写, 大写, 数字, 下划线, 空格, 换行等等
+  - 一个字符串有若干个单词组成
+  - 一个字符串可能又有多行
+  - 一个单词有单词的开头, 以及单词的结尾
+  - 一行文字有一行文字的开头以及结尾
+  - 一个字符串有自己的口头和结尾
+
+我们前面介绍的是从字符角度来匹配的, 这节边界我们要说的是从位置来匹配的问题
+
+> 顺便提一嘴:
+>
+> 边界匹配, 通常与正则表达式的模式有关, 比如: 单行模式, 多行模式等
+
+| 语法 | 含义                                                         |
+| ---- | ------------------------------------------------------------ |
+| `\b` | 单词边界                                                     |
+| `\B` | 非单词边界                                                   |
+| `^`  | 一行的开头 **(一个字符串可能显示多行)**                      |
+| `$`  | 一行的结尾**(一个字符串可能显示多行)**                       |
+| `\A` | 输入的开头**(相当于整个字符串的开头)**                       |
+| `\z` | 输入的结尾**(相当于整个字符串的结尾, 但是结尾不可以是终止符(即`\n` `\r`)** |
+| `\Z` | 输入的结尾 **(结尾可以有终止符(即终止符可以是`\n` `\r`)**    |
+| `\G` | 上一次匹配的结尾                                             |
+
+> 一定要搞清楚什么是输入(整个字符串), 什么是一行
+>
+> 我们平时使用`" "` 描述的字符串在实际显示时, 可能是多行显示的, 整个字符串就是输入, 看到的一行, 就是一行
+
+**一些概念**
+
+- **终止符** (final Terminator、Line Terminator)
+  
+  - `\r`(回车) 、`\n`(换行符)、`\r\n` (回车换行符)
+  
+- **输入** : 整个字符串
+
+  > 你以后看到输入, 就是代表整一个字符串
+
+- **一行**: 以终止符(或整个输入的结尾) 结束的字符串片段
+  
+  - 如果输入是: `"dog\ndog\rdog"` 
+  - 那么3个`dog` 都是一行, 也就是说 `"dog\ndog\rdog"` 表示的是3行, 每行都是一个`dog`
+
+> 总结:
+>
+> 所谓输入, 就是整个字符串, 一行就是一行一行的, 只有明白了输入和一行, 在正则中有些问题才好处理
 
 
 
+**注意:**
+
+1. 边界匹配符合我们之前讲的预定义字符是有本质区别的, 预定义字符是用来匹配某个字符的, 边界匹配符匹配的是位置不是字符
+
+2. 下图标注的地方, 就是我们一个字符串中的所有**单词边界** :
+
+   ![](images/dancibianjie.jpg) 
 
 
 
+### 2、边界匹配符-单词边界
+
+- 示例: (匹配单词边界)
+
+  > 我们可以用单词的边界来匹配一个字符串中的单词
+  
+  ```
+  String regex = "\\bdog\\b";				// 左边是单词边界, 右边也是单词边界
+  findAll(regex,"This is a dog." );
+  // "dog", [10, 13] 
+
+  findAll(regex,"This is a doggie." );
+// not found
+  
+  findAll(regex,"dog is cute" );
+  // "dog", [0, 3] 
+  
+  findAll(regex,"I Love cat, dog, pig." );
+  // "dog", [12, 15] 
+  ```
+  
+- 示例: (匹配非单词边界)
+
+  ```
+  String regex = "\\bdog\\B";		// 左边是单词边界, 右边不能是单词边界
+  findAll(regex,"This is a dog.");
+  // not found
+  
+  findAll(regex,"This is a doggie.");
+  "dog", [10, 13] 
+  
+  findAll(regex,"dog is cute");
+  // not found
+  
+  findAll(regex,"I Love cat, dog, pig.");
+  // not found
+  ```
 
 
 
+### 3、边界匹配符- 一行的开始
+
+```
+String regex = "^dog$";		// 左边是一行的开始, 右边是一行的结束
+findAll(regex, "dog");
+// "dog", [0, 3] 
+
+findAll(regex, "     dog");
+// not found
+
+findAll("\\s*dog$","     dog");
+// "     dog", [0, 8]
+
+findAll("^dog\\w*","dogbblahblah");
+// "dogbblahblah", [0, 12] 
+
+findAll("\\Gdog","dog");
+// "dog", [0, 3] 
+
+findAll("\\Gdog","dog dog");
+// "dog", [0, 3] 
+
+findAll("\\Gdog","dogdog");
+// "dog", [0, 3] 
+// "dog", [3, 6] 
+```
 
 
 
+### 4、边界的细节
+
+- 什么是单词边界
+
+  ```
+  String regex = "\\bdog\\b";		// 左边是一行的开始, 右边是一行的结束
+  findAll(regex, "dog_dog6dog+dog-dog哈 dog ,dog."); 
+  // 打印:
+  "dog", [12, 15] 
+  "dog", [21, 24] 
+  "dog", [26, 29] 
+  // 分析: 从上面的打印结果我们猜测, _ 数字 汉字 字母 应该都是算是单词的一部分, 运算符标点符空格算是单词边界
+  ```
+
+- 下面我们来讲一下, 一行的开头`^` 与 输入的开头`\A`的区别,  一行的结尾`$`  与 输入的结尾`\z` 的区别, 以及注意点
+
+  - 首先要说明一下, 我们前面封装的工具 `findAll(String regex, String input)` 默认使用的是单行模式, 我们要在正则表达式中使用 `^` `$` 表达一行的开头语一行的结尾, 需要在多行模式下才有效果
 
 
 
+## 10、常用模式
+
+### 1、正则表达式常用模式介绍
+
+**单行模式, 多行模式, 不区分大小写模式** 
+
+| 模式             | 含义                                          | 等价的正则写法 |
+| ---------------- | --------------------------------------------- | -------------- |
+| DOTALL           | 单行模式(`.` 可以匹配任意字符, 包括终止符)    | `(?s)`         |
+| MULTILINE        | 多行模式 (`^,$` 才能真正匹配一行的开头和结尾) | `(?m)`         |
+| CASE_INSENSITIVE | 不区分大小写                                  | `(?i)`         |
+
+> 说明:
+>
+> - 以前默认情况下虽然 `.`  是匹配任意字符, 但是是不能匹配终止符(即`\r` `\n` ) 的, 只有在 `DOTALL` 模式下才能匹配终止符(即 `\r` `\n`) 
+>
+>   ```
+>   findAll(".","\r\n"); 
+>   System.out.println("--------");
+>   findAllf(".","\r\n", Pattern.DOTALL);
+>   // 打印:
+>   not found
+>   --------
+>   "
+>   ", [0, 1] 
+>   "
+>   ", [1, 2] 
+>   ```
+>
+> - 在以前, 虽然正则表达式中年`^` 是用来匹配一行的开始, `$` 是用来匹配一行的结尾的, 但是在默认情况下是匹配不出一行的开始和结尾的, 只有在`MULTILINE` 模式下才能匹配出一行的开始和结尾
+>
+>   ```
+>   findAll("^dog$","dog\ndog\rdog");	
+>   System.out.println("------------");
+>   findAllf("^dog$","dog\ndog\rdog", Pattern.DOTALL);	
+>   System.out.println("------------");
+>   findAllf("^dog$","dog\ndog\rdog", Pattern.MULTILINE);
+>   // 打印:
+>   not found
+>   ------------
+>   not found
+>   ------------
+>   "dog", [0, 3] 
+>   "dog", [4, 7] 
+>   "dog", [8, 11] 
+>   ```
+>
+>   
+
+### 2、常用模式示例:
+
+- 不区分大小写模式 (CASE_INSENSITIVE)
+
+  ```
+  findAll("dog","Dog_dog_DOG");
+  // "dog", [4, 7] 
+  
+  findAllf("dog", "Dog_dog_DOG", Pattern.CASE_INSENSITIVE);
+  // "Dog", [0, 3] 
+  // "dog", [4, 7] 
+  // "DOG", [8, 11] 
+  
+  findAll("(?i)dog","Dog_dog_DOG");
+  // "Dog", [0, 3] 
+  // "dog", [4, 7] 
+  // "DOG", [8, 11] 
+  
+  findAll("(?i)Dog","Dog_dog_DOG");
+  // "Dog", [0, 3] 
+  // "dog", [4, 7] 
+  // "DOG", [8, 11] 
+  ```
+
+- 单行模式(DOTALL) & 多行模式 (MULTILINE)
+
+  > 多行模式才能完全发挥 `^`  和 `$` 的特点
+  
+  ```
+  findAll(".","\r\n");
+  // not found
+  
+  findAllf(".","\r\n", Pattern.DOTALL);		// 单行模式
+  // "\r", [0, 1] 
+  // "\n", [1, 2] 
+  
+  findAllf(".","\r\n", Pattern.MULTILINE);	// 多行模式
+  // not found
+  
+  findAllf(".","\r\n", Pattern.DOTALL | Pattern.MULTILINE);	// 单行和多行
+  // "\r", [0, 1] 
+  // "\n", [1, 2] 
+  
+  findAll("(?sm).","\r\n"); // 单行和多行
+  // "\r", [0, 1] 
+  // "\n", [1, 2] 
+  
+  findAll("^dog$","dog\ndog\rdog");		// 这个模式是单行模式, 匹配不出来
+  // not found
+  
+  findAllf("^dog$","dog\ndog\rdog", Pattern.DOTALL); // 单行模式匹配不出来
+  // not found
+  
+  // 多行模式匹配出来了, 每一行有行的开头与行的结尾
+  findAllf("^dog$","dog\ndog\rdog", Pattern.MULTILINE);	
+  // "dog", [0, 3] 
+  // "dog", [4, 7] 
+  // "dog", [8, 11]
+  
+  // 多行模式和单行模式匹配出来了, 每一行有行的开头与行的结尾
+  findAllf("^dog$","dog\ndog\rdog", Pattern.DOTALL | Pattern.MULTILINE);
+  // "dog", [0, 3] 
+  // "dog", [4, 7] 
+  // "dog", [8, 11]
+  ```
 
 
 
+### 3、边界匹配符 \A \z \Z
+
+```
+findAll("\\Adog\\Z","dog");		// 匹配输入的口头 与输入的结尾
+// "dog", [0, 3] 
+
+findAll("\\Adog\\z","dog\n"); // 匹配输入的口头 与输入的结尾(`\z` 结尾不能是终止符 `\n` 或 `\r`
+// not found
+findAll("\\Adog\\Z","dog\n"); // 匹配输入的口头 与输入的结尾(`\z` 结尾可以是终止符 `\n` 或 `\r`
+// "dog", [0, 3] 
+
+findAll("\\Adog\\z","dog\ndog\rdog");			
+// not found
+
+findAllf("\\Adog\\z","dog\ndog\rdog", Pattern.MULTILINE);
+// not found
+```
+
+> 注意:
+>
+> - `\A` `\z` `\Z` 因为表示的是输入的开头和结尾, 因此结果与单行模式多行模式无关
+> - `^` `$` 因为表示的是单行的口头和结尾, 因此结果与单行模式多行模式相关
+
+## 11、常用正则表达式
+
+正则表达式在线测试:
+
+https://c.runoob.com/front-end/854
 
 
 
+| 需求         | 正则表达式        |
+| ------------ | ----------------- |
+| 18位身份证号 | `\d{17}[\dXx]`    |
+| 中文字符     | `[\u4e00-\u9fa5]` |
 
 
 
+## 12、String 类与正则表达式
+
+- String 类中接收正则表达式作为参数的常用方法有
+
+  ```
+  public String replaceAll(String regex, String replacement);
+  public String replaceFirst(String regex, String replacement);
+  public String[] split(String regex);
+  ```
 
 
 
+### 1、练习
 
+- 将单词 row 换成单词line
 
+  ```
+  String s1 = "The row we are looking for is row 8.";
+  String s2 = s1.replace("row", "line"); 
+  String s3 = s1.replaceAll("\\brow\\b", "line");
+  
+  System.out.println(s2);
+  System.out.println(s3);
+  
+  // The line we are looking for is line 8.
+  // The line we are looking for is line 8.
+  
+  String s1 = "Tomorrow I will wear in brown standing in row 10.";
+  String s2 = s1.replace("row", "line"); 
+  String s3 = s1.replaceAll("\\brow\\b", "line");
+  String s4 = s1.replace(" row ", "line"); 
+  
+  System.out.println(s2);
+  System.out.println(s3);
+  System.out.println(s4);
+  // Tomorline I will wear in blinen standing in line 10.
+  // Tomorrow I will wear in brown standing in line 10.
+  // Tomorrow I will wear in brown standing inline10.
+  ```
 
+- 将所有连续的数字替换为 ** 
 
+  ```
+  String s1 = "ab12c3d345efg7h89i1011jk12mnn"; 
+  String s2 = s1.replaceAll("\\d+", "**"); 
+  System.out.println(s2); 
+  // ab**c**d**efg**h**i**jk**mnn
+  ```
 
+- 利用数字分隔字符
 
+  ```
+  String s1 = "ab12c3d345efg7h89i1011jk12mnn"; 
+  String[] arr = s1.split("\\d+");
+  
+  for (int i = 0; i < arr.length; i++) {
+    System.out.format("%d: %s \n", i, arr[i]);
+  }
+  // 打印:
+  0: ab 
+  1: c 
+  2: d 
+  3: efg 
+  4: h 
+  5: i 
+  6: jk 
+  7: mnn 
+  ```
 
+- 提取 重叠的字母, 数字
 
+  ```
+  String input = "aa11+bb23-mj33*dd44/5566%ff77"; 
+  String  regex = "([a-z])\\1(\\d)\\2";
+  Pattern p = Pattern.compile(regex);
+  Matcher m = p.matcher(input);
+  while (m.find()) {
+    System.out.println(m.group());
+    System.out.println(m.group(1));
+    System.out.println(m.group(2));
+  } 
+  
+  // 打印:
+  aa11
+  a
+  1
+  dd44
+  d
+  4
+  ff77
+  f
+  7
+  
+  
+  
+  String input = "aa12+bb34-mj56*dd78/9900"; 
+  String  regex = "[a-z]{2}\\d(\\d)";
+  Pattern p = Pattern.compile(regex);
+  Matcher m = p.matcher(input);
+  while (m.find()) {
+    System.out.println(m.group());
+    System.out.println(m.group(1));
+  } 
+  //打印:
+  aa12
+  2
+  bb34
+  4
+  mj56
+  6
+  dd78
+  8
+  ```
 
+  
 
+# 二三、泛型 (Generics)
 
+## 1、泛型介绍
 
+- 从java5开始, 增加了泛型技术
+- 什么是泛型?
+  - 将类型变为参数, 提高代码复用率
 
-
-
+- 建议的类型参数名称
+  - T: type
+  - E: Element
+  - K: Key
+  - N: Number
+  - V: Value
+  - S、U、V: 2nd、3rd、4th types
+- 
