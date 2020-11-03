@@ -655,25 +655,46 @@ System.out.println(arr);
 
 
 
-## 4、可变参数
+## 4、可变参数 & 可变参数特点
 
-```
-public static int sum(int... nums){
-	int rst = 0;
-	for(int i=0; i<nums.length; i++){
-		rst += nums[i];
-	}
-	return rst;
-}
-```
+- 可变参数的简单使用
+
+  ```
+  public static int sum(int... nums){
+  	int rst = 0;
+  	for(int i=0; i<nums.length; i++){
+  		rst += nums[i];
+  	}
+  	return rst;
+  }
+  ```
 
 - 可变参数必须是方法的最后一个参数, 否则有歧义会将报错. 
 
-> java JDK中自带的 `System.out.printf()` 方法就是使用了可变参数
->
-> 格式字符串参考API文档的 `java.util.Formatter` 类
+  > java JDK中自带的 `System.out.printf()` 方法就是使用了可变参数
+  >
+  > 格式字符串参考API文档的 `java.util.Formatter` 类
 
+- 可变参数的本质
 
+  其实可变参数的本质就是一个普通的数组, eg: `int[]`、`double[]`、`string[]`
+
+- **可变参数的特点**
+
+  可变参数是一个非`null` 的数组, 这个特点很重要
+
+  ```
+  void test(){
+  	printNames(); // 调用可变参数
+  }
+  
+  // 定义可变参数方法
+  void printNames(String≥ ... names){
+  	System.out.println(names == null);  // false
+  }
+  ```
+
+  
 
 ## 5、参数传递
 
@@ -684,6 +705,47 @@ java中的数据类型2种:
   > 值传递
 
 - 引用数据类型: 数组, 对象
+
+
+
+## 6、对象数组的注意点
+
+- 强制类型转换
+
+  ```
+  // 下面的操作是完全可以的
+  Object obj1 = 11;
+  Integer obj2 = (Integer)obj1;
+  System.out.println(obj2);
+  // 打印:
+  11 
+  ```
+
+- **Object[] objs1 = {11,22,33};  ** 的本质
+
+  ```
+  Object[] objs1 = {11,22,33};  
+  Object[] objs2 = new Object[] {11,22,33};   
+  // 上面两句代码本质是一样的, 表示的是一个 Object[] 类型的数组, 只是这个数组里面存储的是 Integer 而已
+  		
+  ```
+
+- 误区
+
+  ```
+  Object[] objs1 = {11,22,33};  
+  // Integer[] array = (Integer[])objs1; 错误 java.lang.ClassCastException
+  ```
+
+  > `Object[] objs1 = {11,22,33};` 表示的是一个 Object[]  数组
+  >
+  > `Integer[]` 类型的数组与 `Object[]` 类型的数组是不同类型的数组, 因此是不能进行强制转换的
+  >
+  > 因此,结论:
+  >
+  > `objs1` 是不能赋值给 `array` 的, 因为 `Object[]` 类型与 `Integer[]` 是不同的类型, 且没有继承关系, 类型不对
+
+
 
 
 
@@ -7140,7 +7202,7 @@ https://c.runoob.com/front-end/854
 
 - 从java5开始, 增加了泛型技术
 - 什么是泛型?
-  - 将类型变为参数, 提高代码复用率
+  - **将类型变为参数, 提高代码复用率** , 原来可能写几个类, 现在一个泛型类搞定
 
 - 建议的类型参数名称
   - T: type
@@ -7149,4 +7211,1737 @@ https://c.runoob.com/front-end/854
   - N: Number
   - V: Value
   - S、U、V: 2nd、3rd、4th types
-- 
+
+
+
+## 2、泛型类型(Generic type)
+
+### 1、泛型类型介绍
+
+- **什么是泛型 类型?** 
+
+  - 使用了**泛型的类 或者 接口** , 这个类的类型或者这个接口的类型, 我们就称为泛型类型
+
+    > 同理, 如果一个类接、口没有使用泛型技术, 我们就不能说这个类、接口是泛型类型
+
+  - 比如: 
+
+    - java.util.Comparator
+    - Java.util.Comparator
+
+  ```
+  // 定义泛型类 
+  public  class Student<T>{  // <T> 是类型的占位符 
+  	private T score;
+  	public T getScore(){
+  		return score;
+  	}
+  	public void setScore(T score){
+  		this.score = score;
+  	}
+  }
+  
+  // 使用泛型类
+  // java7以前的写法
+  Student<String> stu = new Student<String>();
+  
+  // java7以后, 可以省略右边<>中的类型
+  Student<String> stu = new Student<>();
+  stu.setScore("A");
+  System.out.println(stu.getScore());
+  
+  Student<Double> stu2 = new Student<>();
+  stu2.setScore(12.0);
+  System.out.println(stu2.getScore());
+  // 注意: 右边的<>是不可省略的, <>内的类型是可以省略的
+  ```
+
+
+
+### 2、泛型类型的 类型参数
+
+所谓泛型类的类型参数, 就是定义在泛型类右边的`<>` 中写的参数 (type parameter)
+
+```
+// 此处的 T 就是类型参数
+public class Student<T>{
+	public T score;
+}
+
+// 此处的N 和 S 都是类型参数
+public class Teacher<N, S>{
+	public N age;
+	public S name;
+}
+
+// 类型参数的名称一般是没有要求的, 随便写, 但是一般我们都只写一个字母 
+```
+
+
+
+**注意:** 
+
+泛型类型的 类型参数只能是引用类型, 不能是基本类型, 如下:
+
+```
+// Student<double> stu2 = new Student<>();  错误写法, double 是基本类型
+
+Student<Double> stu2 = new Student<>();  // 正确写法
+```
+
+
+
+### 3、泛型类型的 多个类型参数
+
+一个泛型类型, 可以有一个或者多个类型参数, 如下:
+
+```
+// 1. 1个类型参数
+public class Person<N>{
+	private N age; 
+	public Person(N age){
+		this.age = age;
+	}
+}
+
+// 2. 多个类型参数
+public class Student<N, S>{
+	private N no;
+	private S score;
+	public Student(N no, S score){
+		this.no = no;
+		this.score = score;
+	}
+}
+```
+
+
+
+### 4、定义 泛型类型的 类型占位符
+
+```
+public class Person<N>{
+}
+
+public class Student<N, S>{
+}
+
+public interface Runnable<T1,T2>{
+}
+```
+
+- 我们 称`Person<N>` 、 `Student<N, S>`  、`Runnable<T1,T2>`为泛型类型
+- 称 `Person<N>` 中的 `N` , `Student<N, S>` 中的`N` `S` , `Runnable<T1, T2>` 中的`T1` `T2` 为泛型类型中的类型占位符
+- 在定义类 或 接口时在类名或接口名 右边写上`<N>` 或`<T1, T2>`  称为给泛型类型定义 类型占位符
+
+
+
+### 5、泛型类型的继承
+
+
+
+#### 1、泛型类型的继承-关系1
+
+**同一个类, 不同的参数类型, 结果泛型类型之间没有继承关系**
+
+即: 类相同, 参数类型不同, 泛型类之间不存在继承关系
+
+```
+// 系统的Integer 定义如下:
+public final class Integer extends Number implements Comparable<Integer> {
+... ...
+}
+
+// Box 类定义如下
+public class Box<E>{
+	public E element;
+}
+```
+
+- `Integer`  继承自 `Number` , 有父子关系
+- `Box<String>` 与 `Box<Object>` 之间不存在继承关系
+- `Box<String>`  继承自 `Object` , 有父子关系
+- `Box<Object>` 继承自 `Object` , 有父子关系
+
+**结论1:**
+
+```
+Box<String> strBox = new Box<>();
+Box<Object> objBox = new Box<>();
+objBox = strBox;  // 错误
+// Box<String>  与 Box<Object> 之间是没有继承关系的, 不能直接赋值
+```
+
+
+
+#### 2、泛型类型的继承-关系2
+
+**类是继承关系, 参数类型相同, 泛型类之间是继承关系** 
+
+- 示例如下:
+
+  ```
+  public interface Collection<E> extends Iterable<E>;
+  public interface List<E> extends Collection<E>;
+  public interface ArrayList<E> extends List<E>;
+  ```
+
+  - 继承关系如下:
+
+    `ArrayList<String>`  继承自`List<String>` 继承自 `Collection<String>` 继承自`Iterable<String>
+
+**结论:**
+
+```
+Iterable<String> it = null;
+Collection<String> co = null;
+List<String> li = null;
+ArrayList<String> arr = null;
+
+// 因为上面的类型有继承关系, 因此可以下面的赋值
+it = co;
+co = li;
+li = arr; 
+```
+
+
+
+#### 3、泛型类型的继承-关系3
+
+**类是继承关系, 参数类型也是继承关系, 泛型类之间不存在继承关系** 
+
+**结论:**
+
+```
+// 但是, 下面的就不行了
+List<Object> lo = null;
+ArrayList<String>  arrs = null;
+lo = arrs; // 错误
+```
+
+> 虽然 List 和 ArrayList 是继承关系, Object 和 String 是继承关系, 但是 List<Object> 和 ArrayList<String> 之间不是继承关系
+
+
+
+#### 4、泛型类型的继承-关系4
+
+**泛型类型的子类, 可以在父类的基础上扩充泛型的参数类型**
+
+下面的操作是可以的
+
+```
+public interface MyList<E, T> extends List<E>{
+	void setNo(T no);
+}
+```
+
+![](images/fjc.jpg) 
+
+```
+List<string> li = null;
+MyList<String, Integer> mli1 = null;
+MyList<String, Double> mli2 = null;
+MyList<string, String> mli3 = null;
+
+li = mli1; // ok
+li = mli2; // ok 
+li = mli3; // ok
+
+mli1 = mli2; // error
+mli1 = mli3; // error 
+```
+
+
+
+## 3、原始类型 (Raw Type)
+
+- **什么是原始类型?** 
+
+  - 没有传递具体的类型给 泛型的类型参数的 类型, 称为原始类型, 如下:
+
+  ```
+  // Box 称为Box<E> 的原始类型 (Raw type)
+  Box rawBox = new Box();				// 如果你在开发中这样写一般会报 warning: rawtypes 警告
+  Box<String> strBox = new Box<>();
+  Box<Object> objBox = new Box<>();
+  // 即 `Box` 原始类型, `Box<String>` 非原始类型
+  ```
+
+  > 官方, 不建议我们使用泛型类的原始类型, 这也是警告的原因
+
+- 原始类型与 泛型类型的赋值, 注意点:
+
+  ```
+  Box rawBox = new Box();					// 原始类型
+  Box<String> strBox = new Box<>();		// 泛型类型
+  Box<Object> objBox = new Box<>(); 		// 泛型类型
+  
+  // 我们可以直接将泛型类型 赋值给原始类型, 不会报错和警告
+  rawBox = strBox;	// ok
+  rawBox = objBox;	// ok 
+  
+  // 也可以将 原始类型赋值给泛型类型, 报警告
+  strBox = rawBox;	// unchecked warning
+  objBox = rawBox;    // unchecked warning
+  ```
+
+  > - 当使用了 **原始类型** 时, 编译器会给出 **rawtypes** 警告, 可以使用 **@SuppressWarnings("rawtypes");** 消除
+  >
+  > - 将 **非原始类型** 赋值给 **原始类型** 时, 编译器不会报任何警告和错误
+  > - 将**原始类型** 赋值给**非原始类型** 时, 编译器会报警告**unchecked** , 可以使用**@SuppressWarnings("unchecked")** 消除
+
+- 当我们使用 泛型类的原始类型时, 其实编译器是这样处理的
+
+  ```
+  class Box<E>{
+  	public E element;
+  }
+  
+  void test(){
+  	// 原始类型
+  	Box rawBox = new Box();
+  	Box<Object> objBox = new Box<>();
+  }
+  ```
+
+  > 测试验证发现:
+  >
+  > - rawBox 与 objBox 是同一种类型, 即原始类型会被编译器默认处理为 Box<Object> 类型
+  > - 虽然rawBox 与 objBox类型一样, 但是原始类型与泛型类型还是有区别
+
+
+
+## 4、泛型方法
+
+### 1、泛型方法概念
+
+> 初学者, 泛型方法容易入坑
+
+- **什么是泛型方法?**
+
+  - 前面我们已经介绍过了, 使用了泛型的 类 或 接口, 我们称这种类或者接口为泛型类型
+  - 同理, 在方法中使用了泛型的方法, 我们称之为泛型方法. (这样说并不准确) 
+
+  ```
+  // 注意, 下面的方法不是泛型方法, 只是算泛型类型的一部分
+  public class Person<T>{
+  	private T age;
+  	public void setAge(T age){	// 这个方法只能算是, 泛型类 `Person<T>` 的一部分
+  		this.age = age;
+  	}
+  }
+  ```
+
+  - 泛型方法的准确描述应该是这样的:
+    - 类不是泛型类, 但是类里面的方法使用了泛型
+    - 这样的方法, 我们就称之为泛型方法, 如下:
+
+  ```
+  // Arrays 中定义的 sort方法就是一个 泛型方法, 如下: 
+  // Array 不是泛型类, 但是 sort 方法是泛型方法
+  public class Arrays {
+  
+  	 public static <T> void sort(T[] a, Comparator<? super T> c) {
+          if (c == null) {
+              sort(a);
+          } else {
+              if (LegacyMergeSort.userRequested)
+                  legacyMergeSort(a, c);
+              else
+                  TimSort.sort(a, 0, a.length, c, null, 0, 0);
+          }
+      }
+  }
+  ```
+
+
+
+### 2、泛型方法应用的使用情景
+
+- 比如我们定义了一个泛型类, 如下:
+
+  ```
+  class Student<T1, T2>{
+  	public T1 age;
+  	public T2 height;
+  	
+  	public void setAge(T1 age){
+  		this.age = age;
+  	}
+  
+  	public void setHeight(T2 height) {
+  		this.height = height;
+  	} 
+  }
+  ```
+
+- 外部使用泛型类, 作为方法参数:
+
+  ```
+  public class Test {
+  
+  	public static void main(String[] args) {
+  		// 定义一个  Student<Integer, Double> 实例
+  		Student<Integer, Double> stu1 = new Student<>();
+  		stu1.setAge(18);
+  		stu1.setHeight(20.0);
+  		set(stu1, 10, 1.88);	// ok 不报错
+  		display(stu1);				// ok 不报错
+  		
+  		
+  		Student<String, String> stu2 = new Student<>();
+  		// set(stu2, 11, 1.44);   // error , set方法 参数类型错误(即 stu2 类型不对)
+  		// display(stu2);					// error , set方法 参数类型错误(即 stu2 类型不对)
+  	}
+  	
+  	static void set(Student<Integer, Double> stu, Integer age, Double height) {
+  		stu.setAge(age);
+  		stu.setHeight(height);
+  	}
+  	static  void display(Student<Integer, Double> stu) {
+  		System.out.println(stu.getAge());
+  		System.out.println(stu.getHeight());
+  	}
+  }
+  ```
+
+  > 在上面封装 `set` 方法时, 其实我们原本想的是你 任意传递一个 `Student<T1, T2>` 对象, 我们都可以为它设置 `age` 和`height` , 但是从上面的定义方法 `set(Student<Integer, Double> stu, Integer age, Double height)` 我们发现, 我们只能为 一种泛型类 `Student<Integer, Double>` 这一种类型的对象调用 set 方法, 其它类型的Student 就出问题了, 比如: `Student<String, String>` 类型就不能使用这个 set 方法, 显然有通用型问题.  那我们要怎样才能解决这个对泛型类的操作的问题呢? 
+
+
+
+**说白了, 上面的问题就是泛型类作为方法的参数问题,要解决泛型类作为方法的参数或者返回值通用的问题, 我们必须使用泛型方法** , 下一节我们就来介绍泛型方法的定义
+
+
+
+### 3、泛型方法的定义
+
+- 普通方法定义
+
+  ```
+  // 这个普通方法, 只能处理泛型类的一种类型, 即 `Student<Integer, Double>` , 通用性地
+  static void set(Student<Integer, Double> stu, Integer age, Double height) {
+    stu.setAge(age);
+    stu.setHeight(height);
+  }
+  
+  static  void display(Student<Integer, Double> stu) {
+    System.out.println(stu.getAge());
+    System.out.println(stu.getHeight());
+  }
+  ```
+
+- **泛型方法定义 ** 
+
+  ```
+  static <T1, T2> void set(Student<T1, T2> stu, T1 age, T2 height) {
+    stu.setAge(age);
+    stu.setHeight(height);
+  }
+  
+  static <T1, T2> void display(Student<T1, T2> stu) {
+    System.out.println(stu.getAge());
+    System.out.println(stu.getHeight());
+  }
+  ```
+
+- **泛型类型的定义**
+
+  ```
+  // 泛型类型 类定义
+  public class Student<T1, T2>{
+  	public T1 age;
+  	public T2 height;
+  }
+  
+  // 泛型类型 接口定义
+  public interface Runnable<T1>{
+  	void run(T1);
+  }
+  ```
+
+  从上面的定义泛型方法, 以及我们前面讲过的定义泛型类型, 我们发型不论是定义泛型类型还是定义泛型方法都有这样的特点:
+
+  1. 先使用 `<T1>` 或者 `<T1, T2>` 或者 `<T1, T2, T3>` 这种方式在 类中或者方法中, 声明类型占位符, 说明在后面的泛型类型或者泛型方法中将要用到对应的占位类型
+  2. 泛型类型或者泛型方法中的类型占位符定义好后, 可以在泛型类型 或者 泛型方法中使用 占位类型来定义变量了
+
+  不同的是, 泛型类型和 泛型方法声明 类型占位符的位置不一样, 泛型类型是在 类名的右边使用 `<T1, T2>` 这样的方式声明的, 泛型方法实在 方法的返回值类型的 左边使用`<T1, T2>` 这种样式定义的
+
+  
+
+  ### 4、泛型类型 & 泛型方法的综合使用
+
+  ```
+  // 定义 泛型类型 的类
+  class Student<T1, T2>{
+  	private T1 age;
+  	private T2 height;
+  	
+  	public T1 getAge() {
+  		return age;
+  	}
+  	public T2 getHeight() {
+  		return height;
+  	}
+  	
+  	public void setAge(T1 age){
+  		this.age = age;
+  	}
+  	
+  	public void setHeight(T2 height) {
+  		this.height = height;
+  	} 
+  }
+  ```
+
+- 调用泛型类, 简单的写法
+
+  ```
+  // 测试
+  public class Main {
+  
+  	public static void main(String[] args) {
+  		Student<Integer, Double> stu1 = new Student<>(); 
+  		set(stu1, 10, 1.88);			// 简化版调用泛型方法
+  		display(stu1);						// 简化版调用泛型方法
+  		
+  		Student<String, String> stu2 = new Student<>(); 
+  		set(stu2, "age: 18", "height: 1.88");  // 简化版调用泛型方法  
+  		display(stu2);												 // 简化版调用泛型方法
+  	}
+  	
+  	// 定义泛型方法
+  	static <T1, T2> void set(Student<T1, T2> stu, T1 age,T2 height) {
+  		stu.setAge(age);
+  		stu.setHeight(height);
+  	}
+  	
+  	// 定义泛型方法
+  	static <T1, T2> void display(Student<T1, T2> stu) {
+  		System.out.println(stu.getAge());
+  		System.out.println(stu.getHeight());
+  	}
+  }
+  
+  // 打印结果, 一切ok:
+  10
+  1.88
+  age: 18
+  height: 1.88
+  ```
+
+  
+
+- 调用泛型类, 完整的写法
+
+  > 需要在调用的方法前, 点号`.` 后, 写清楚泛型的类型
+
+  ```
+  // 测试
+  public class Main {
+  
+  	public static void main(String[] args) {
+  		Student<Integer, Double> stu1 = new Student<>(); 
+  		Main.<Integer, Double>set(stu1, 10, 1.88);			// 完整版调用泛型方法
+  		Main.<Integer, Double>display(stu1);						// 完整版调用泛型方法
+  		
+  		Student<String, String> stu2 = new Student<>(); 
+  		Main.<String, String>set(stu2, "age: 18", "height: 1.88");  // 完整版调用泛型方法
+  		Main.<String, String>display(stu2);												 // 完整版调用泛型方法
+  	}
+  	
+  	// 定义泛型方法
+  	static <T1, T2> void set(Student<T1, T2> stu, T1 age,T2 height) {
+  		stu.setAge(age);
+  		stu.setHeight(height);
+  	}
+  	
+  	// 定义泛型方法
+  	static <T1, T2> void display(Student<T1, T2> stu) {
+  		System.out.println(stu.getAge());
+  		System.out.println(stu.getHeight());
+  	}
+  }
+  
+  // 打印结果, 一切ok:
+  10
+  1.88
+  age: 18
+  height: 1.88
+  ```
+
+  
+
+### 4、泛型方法 应用
+
+```
+// 泛型类
+public class Box<E>{
+	private E element;
+	public Box(){}
+	public Box(E element){
+		this.element = element
+	}
+}
+
+// 泛型方法
+<T> void addBox(T element, List<Box<T>> boxes){
+	Box<T> box = new Box<>(element);
+	boxes.add(box);
+}
+
+List<Box<Integer>> boxes = new ArrayList<>();
+addBox(11, boxes);
+addBox(12, boxes);
+addBox(13, boxes);
+```
+
+
+
+### 5、泛型方法 - 类型推断
+
+```
+public class Collections{
+	public static final <T> List<T> emptyList(){
+		return (List<T>) EMPTY_LIST;	// 根据返回值类型推到
+	}
+}
+
+// 测试
+List<String> list1 = Collections.emptyList();
+List<Integer> list2 = Collections.emptyList();
+```
+
+
+
+### 6、泛型方法 -- 构造方法
+
+```
+public class Person<T>{
+	private T age;
+	public <E> Person(E name, T age){ // 这种用法比较少, E 是来自构造方法本身, T 是来自于泛型类型参数
+	
+	}
+}
+
+// 测试
+Person<Integer> p1 = new Perosn("jack", 19);
+Person<Double> p2 = new Person(666, 1.90);
+Person<String> p3 = new Person(2.0, "80后");
+```
+
+
+
+### 7 、泛型方法的细节
+
+- 正确的写法
+
+  ```
+  public class Box<E>{
+  	private E element;
+  	public E getElement(){
+  		return this.element;
+  	}
+  }
+  ```
+
+- 错误的写法
+
+  ```
+  public class Box<E>{
+  	private E element;
+  	public E getElement(){
+  		return this.element;
+  	}
+  	
+  	public static void print(E elment){  // 错误, 因为是静态方法, E 这个类型占位符需要 单独定义
+  		// 实现省略 ... 
+  	}
+  }
+  ```
+
+>  **结论:**
+>
+> - 泛型类型的 类型参数, 只能用在实例方法上, 不能用在静态方法上.
+> - 换句话说, 如果定义的静态方法想用泛型技术的话, 只能把静态方法定义成 泛型方法
+
+- 正确的写法
+
+  ```
+  public class Box<E>{
+  	private E element;
+  	public E getElement(){
+  		return this.element;
+  	}
+  	
+  	public <E> static void print(E elment){  
+  		// 实现省略 ... 
+  	}
+  }
+  ```
+
+  
+
+## 5、限制类型参数
+
+### 1、泛型类型参数 限制 (基本款)
+
+基本款, 限制类型参数满足一个条件即可, eg:  **`<T extends A>`** 
+
+
+
+- 可以通过 **extend** 对类型参数增加一些限制条件, 比如: **`<T extends A>`** 
+
+  > - **extends** 后面可以跟 **类名、接口名** 
+  > - 代表**T** 必须是**A** 类型, 或者继承自**A** , 或者实现**A** 
+
+  ```
+  public class Person<T extends Number>{  // 即 T必须是Number 或子类
+  	private T age;
+  	public int getAge(){
+  		if(age == null){
+  			return 0;
+  		}
+  		return age.intValue();
+  	}
+  	public Person(T age){
+  		this.age = age;
+  	}
+  }
+  ```
+
+  > 因为, 我们只想用一个数字来描述 age, 如果 T 这个类型参数不做限制, 什么类型都可以, 这样代码就会出现意料之外的错误, 所以此处我们必须是用 `<T extends Number>` 对类型占位符做类型的限制
+
+
+
+### 2、泛型类型参数 限制 (高级款)  
+
+通知满足多个条件, eg: `<T extends A & B & C>` 
+
+- 我们在给泛型的类型参数做类型限制时, 除了可以要求泛型的类型参数满足一个类型要求, 我们还可以要求这个类型参数满足多个类型的限制要求, 具体说明如下
+
+  > `<T extends A & B & C>` 
+  >
+  > 表示, T 必须同时满足 A、B、C
+
+- 这种泛型类型参数的高级约束, 其实还有他的注意点:
+
+  1. 如果在 extends 后面要写多个约束, eg: `<T extends A & B & C>`  那么
+
+     `A、B、C` 可以都是接口类型, 这样的话 `A、B、C` 书写可以没有顺序区分
+
+  2. 如果`A、B、C` 中有类的话, 只能有一个类, 且这个类就是`A` , `B、C` 是接口, 为什么是这样要求的呢?
+
+     这其实也很好理解, 因为java是单继承的语言.
+
+
+
+### 3、泛型类型参数, 限制类型 示例
+
+```
+public static <T extends Comparable<T>> T getMax(T[] array){
+	if(array == null || array.length == 0){
+		return null;
+	}
+	
+	T max = array[0];
+	for(int i = 1; i < array.length; i++){
+		if(array[i] == null) continue;
+		if(array[i].compareTo(max) <= 0) continue;
+		max = array[i];
+	}
+	return max;
+}
+
+// 其实, Comparable<T> 这个约束很好理解, 就是一个带泛型的接口定义而已
+// 从这个示例, 我们发现, 泛型的类型参数中也是可以有泛型类型参数的, 在实际开发中不要搞懵了, 这一点初学者容易犯错误 
+// 泛型的参数类型占位符是 <T extends Comparable<T>>
+// 泛型的参数类型的约束类型 是  Comparable<T>
+```
+
+> 在JDK 中已经定义了一个Comparable<T> 接口, 如下: 
+>
+> ```
+> public interface Comparable<T> {
+> 	public int compareTo(T o);
+> }
+> ```
+>
+> Integer 已经实现了Comparable<T> 接口
+>
+> ```
+> public final class Integer extends Number implements Comparable<Integer> {
+> 
+> public int compareTo(Integer anotherInteger) {
+>     return compare(this.value, anotherInteger.value);
+> }
+> public static int compare(int x, int y) {
+>     return (x < y) ? -1 : ((x == y) ? 0 : 1);
+> }
+> // 其它省略 ... 
+> }
+> ```
+
+**下面我们来自定义 一个实现 `Comparable<T>` 接口的类, 来调用前面定义的 `<T extends Comparable<T>> T getMax(T[] array)` 方法**, 如下:
+
+
+
+```
+public class Person implements Comparable<Person>{
+	private int age;
+	public int getAge(){
+		return this.age;
+	}
+	public Person(int  age){
+		this.age = age;
+	}
+	
+	@Override 
+	public String toString(){
+		return "person: " + this.age;
+	}
+	
+	//------------实现 Comparable<Person>---代表, Person 实例对象可以比较 Person
+	@Override 
+	public int compareTo(Person p){
+		// 注意: 因为 p 是引用类型, 需要对非null 做判空处理
+		if(p == null) return 1;
+	
+		if(this.getAge() > p.getAge()){
+			return 1;
+		}
+		else if(this.getAge() < p.getAge()){
+			return -1;
+		}
+		return 0;
+	}
+}
+
+
+public static void main(String[] args){
+	Person[] array = new Person[3];
+	array[0] = new Person(11);
+	array[1] = new Person(22);
+	array[2] = new Person(33);
+	System.out.println(getMax(array)); // 33
+	// 打印结果:
+	person: 33
+	
+	// 因为Person实现了Comparable<T>, 所以此处我们可以调用Arrays.sort排序
+  Arrays.sort(array);	// 默认排序从小到大
+  System.out.println(Arrays.toString(array));
+	// 打印结果:
+	[person: 11, person: 22, person: 33]
+}
+```
+
+
+
+### 4、Comparable 对比 Comparator
+
+- 如果数组元素本身具备可比较性(即, 实现了 java.util.Comparable 接口)
+
+  - 那么可以直接使用 **Arrays.sort** 方法对元素进行排序
+
+- 如果数组元素本身不具备可比较性(即, 没有实现 java.util.Comparable 接口)
+
+  - 我们可以使用**Arrays.sort(T[] a, Comparator<? super T> c)** 方法来对数组进行自定义排序
+
+    > Comparator  是一个函数式接口, 因此我们可以使用匿名类或者 lambda 表达式
+
+  - 那么, **Compatator** 存在的意义是什么? 
+    1. 可以在不修改源代码的基础上, 对数据进行排序
+    2. 当数组元素不具备可比较性时, 我们可以自定排序
+
+- Arrays 默认排序
+
+  ```
+  // 使用 Arrays.sort 方法对Integer[] 进行默认排序
+  Integer[] arr = {5,4,3,2,1};
+  Arrays.sort(arr);  // 注意, 默认排序数组中不能有null
+  System.out.println(Arrays.toString(arr));
+  // 打印
+  [1, 2, 3, 4, 5]
+  ```
+
+- Arrays 自定义排序
+
+  ```
+  // 使用Arrays.sort(T[] a, Comparator<? super T> c)) 进行自定义排序
+  Arrays.sort(arr, new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+      if (o1 == null) return -1;
+      if (o2 == null) return 1;
+      return	o1.intValue() - o2.intValue();
+    }
+  });
+  System.out.println(Arrays.toString(arr));
+  // 打印;
+  [null, 1, 2, 3, 4, 5]
+  
+  
+  //--------使用lambda 优化匿名类-------
+  Arrays.sort(arr, (Integer o1, Integer o2) -> {
+    if (o1 == null) return -1;
+    if (o2 == null) return 1;
+    return	o1.intValue() - o2.intValue();
+    
+  });
+  System.out.println(Arrays.toString(arr));
+  // 打印;
+  [null, 1, 2, 3, 4, 5]
+  ```
+
+
+
+### 5、泛型类型参数 限制类型 Comparable 高级用法
+
+```
+class Student<T extends Comparable<T>> implements Comparable<Student<T>>{ 
+	
+	private T score;
+	public T getScore() {
+		return this.score;
+	}
+	public void setScore(T score) {
+		this.score = score;
+	}
+	
+	public Student(T score) {
+		super();
+		this.setScore(score);
+	}
+	
+	@Override
+	public int compareTo(Student<T> o) { 
+		return score.compareTo(o.score);
+	}
+}
+```
+
+> 代码分析:
+>
+> 1.简单的说, `class Student<T extends Comparable<T>> implements Comparable<Student<T>>` 中的 `<T extends Comparable<T>>`  的作用是对Student中要用到的泛型类型参数的占位定义, 表示**Student类**用的参数类型需要具备可比较性
+>
+> 2.  `class Student<T extends Comparable<T>> implements Comparable<Student<T>>` 中的 `<T extends Comparable<T>>`  中的`implements Comparable<Student<T>>`  表示的是**Student类** 实现了**Comparable接口** 具备可比较性, 且 `Comparable<Student<T>>` 中的`<Student<T>` 表示的是**Student类** 中的比较接口方法的参数类型是`<Student<T>>` 类型的
+> 3. 从这个示例我们发现 类名后面的泛型参数类型占位符, 约束的泛型参数类型的范围是类, 表示的是类具备这样的约束
+> 4. 而implements 后面的泛型参数类型约束描述的是接口中用到的参数类型的约束
+>
+> 其实, 也很好理解, 各段管理各段, 各司其职嘛
+
+
+
+
+
+# 二四、集合 (Collections)
+
+## 1、java中的常用集合介绍
+
+- 在**java.util** 包中有个集合框架 `(Collections Framework)` , 提供了一大堆常用的数据结构
+  - `ArrayList` 、`LinkedList` 、`Queue`、`Stack`、`HashSet`、`HashMap` 等
+- 数据结构是计算机存储、组织数据的方式
+  - 常用的数据结构:`线性结构` 、`树形结构`、`图形结构` 
+
+> 在实际应用过程中, 根据使用场景来选择最适合的数据结构, 即可
+
+- java中各种常用的数据继承关
+
+  ![](images/shhujujiegou.jpg) 
+
+  > - 紫色代表接口
+  > - 绿色代表实现类
+  > - 蓝色代表抽象类
+
+**思考:**
+
+为何 Map 如此独立? 跟 Collection、Iterable 毫无关系? 
+
+
+
+## 2、List  VS  Set  VS  Map
+
+- List 的特点
+  - 可以存储重复的元素
+    - 元素之间`equals` 可能返回 true
+  - 可以通过索引访问元素
+  - 有记录元素的添加顺内
+- Set 的特点
+  - 不可以存储重复的元素
+    - 元素之间`equals` 不可能返回 true
+  - 不可以通过索引访问元素
+  - 不记录元素的添加顺序(LinkedHashSet 例外)
+- Map 的特点
+  - 不可以存储重复的key
+    - key之间`equals` 可能返回 true
+  - 不可以通过索引返回 `key-value`
+  - 不记录`key-value` 的添加顺序 (linkedHashMap 除外)
+
+
+
+## 3、数组的局限性
+
+```
+int[] array = new int[4];
+array[0] = 11;
+array[1] = 22;
+array[2] = 33;
+```
+
+![](images/arrayjxx.jpg) 
+
+- 无法动态扩容
+- 操作元素的过程不够面向对象
+
+
+
+**java.util.ArrayList 是java中的动态数组** 
+
+- 一个可以动态扩容的数组
+- 封装了各种实用的数组操作
+
+
+
+## 4、ArrayList 的基本使用
+
+### 1、ArrayList 基本能使用介绍
+
+- ArrayList 的基本用法
+
+  **ArrayList 实现了List接口, 而List接口继承自Collection接口**
+
+  ```
+  ArrayList listArr = new ArrayList();
+  listArr.add(null);
+  listArr.add(false);
+  listArr.add(11);
+  listArr.add('8');
+  listArr.add(null);
+  
+  System.out.println(listArr.indexOf(null));		// 获取指定元素的 序号
+  System.out.println(listArr.lastIndexOf(null));
+  System.out.println(listArr.size() );			// 获取 array 的长度
+  System.out.println(listArr);
+  
+  // 打印:
+  0
+  4
+  5
+  [null, false, 11, 8, null]
+  ```
+
+- ArrayList 常用方法汇总
+
+  ```
+  public int size();				// 获取元素的个数
+  public boolean isEmpty();	// 判断集合是否为空
+  public boolean contains(Object o);	// 判断是否包某个元素
+  public int indexOf(Object o);				// 获取指定元素的索引
+  public int lastIndexOf(Object o);		// 反向 获取指定元素的索引
+  public E get(int index);	
+  // 如果之前index没有对应的元素会报错 IndexOutOfBoundsException
+  public E set(int index, E element);		// 返回的是 set 之前的元素
+  public boolean add(E element);
+  public E remote(int index);
+  public boolean remove(Object o);
+  public void clear();
+  
+  public boolean addAll(Collection<? extends E> c);
+  public boolean addAll(int index, Collection<? extends E> c);
+  public boolean removeAll(Collection<?> c);
+  public boolean retainAll(Collection<?> c);
+  public void forEach(Consumer<? super E> action);
+  public void sort(Comparator<? super E> c);
+  
+  public Object[] toArray();
+  public <T> T[] toArray(T[] a);
+  public void trimToSize();
+  public void ensureCapacity(int minCapacity);
+  ```
+
+
+
+### 2、ArrayList 使用注意点:
+
+一般来说, 在java中我们不会直接定义一个 **ArrayList**  的引用对象, 而是直接定义一个**List** 的引用, 面向接口编程, 如下:
+
+```
+// 不推荐这种写法
+ArrayList<String> arrayList = new ArrayList<String>();
+
+// 推荐这种写法
+List<String> list = new ArrayList<String>();	
+使用List 以后可以随时换方案, 如下:
+list = new LinkedList<String>();
+这种就称为面向接口编程
+```
+
+> 因为, ArrayList实现了List接口, 所有我们直接定义List类型
+>
+> // public interface List<E> extends Collection<E> 
+> // public class ArrayList<E> extends AbstractList<E> implements List<E>, RandomAccess, Cloneable, java.io.Serializable
+
+- 示例 
+
+  **public boolean removeAll(Collection<?> c);** 
+
+  删除交集
+
+  ```
+  List<Integer> list1 = new ArrayList<>();
+  list1.add(11);
+  list1.add(22);
+  list1.add(33);
+  list1.add(44);
+  
+  List<Integer> list2 = new ArrayList<>();
+  list2.add(22);
+  list2.add(33);
+  list2.add(55);
+  
+  System.out.println("list1: " + list1);
+  System.out.println("list2: " +list2);
+  
+  // 从list1 中删除 list2 中的所有元素
+  list1.removeAll(list2);
+  System.out.println("list1: " +list1);
+  
+  // 打印:
+  list1: [11, 22, 33, 44]
+  list2: [22, 33, 55]
+  list1: [11, 44]
+  ```
+
+- 示例:
+
+  **public boolean retainAll(Collection<?> c);** 
+
+  保留交集
+
+  ```
+  List<Integer> list1 = new ArrayList<>();
+  list1.add(11);
+  list1.add(22);
+  list1.add(33);
+  list1.add(44);
+  
+  List<Integer> list2 = new ArrayList<>();
+  list2.add(22);
+  list2.add(33);
+  list2.add(55);
+  
+  System.out.println("list1: " + list1);
+  System.out.println("list2: " +list2);
+  
+  // 从list1 中保留 list2 中的所有元素
+  list1.retainAll(list2);
+  System.out.println("list1: " +list1);
+  
+  // 打印:
+  list1: [11, 22, 33, 44]
+  list2: [22, 33, 55]
+  list1: [22, 33]
+  ```
+
+  
+
+
+
+### 3、ArrayList - toArray 转换成普通数组 
+
+#### 1、toArray() 简单使用
+
+ArrayList, LinkedList 等都是一种数据结构, 是一种动态的数组, 但是有时我们想将这种复杂的数据结构转换成最普通的数组, 我们需要怎么做呢? 
+
+在**List** 接口中定义了一个方法**Object[] toArray();**  方法, 通过`toArray()` 方法可以将实现了List接口的数据结构转换成最普通的数组. 因为 ArrayList, LinkedList 等都实现了List 接口, 所有可以
+
+- toArray() 的简单使用
+
+  ```
+  List<Integer> list1 = new ArrayList<>();
+  list1.add(11);
+  list1.add(22);
+  list1.add(33);
+  list1.add(44);   
+  System.out.println(list1); 
+  Object obj[] = list1.toArray(); 
+  System.out.println(obj);
+  System.out.println(Arrays.toString(obj));
+  
+  // 打印:
+  [11, 22, 33, 44]
+  [Ljava.lang.Object;@6d06d69c
+  [11, 22, 33, 44]
+  ```
+
+
+
+#### 2、toArray() 细节
+
+- 当我们使用 toArray() 将一个集合转换成普通数组时, 结果是一个 `Object[]`类型, 如下:
+
+  ```
+  List<Integer> list1 = new ArrayList<>();
+  list1.add(11);
+  list1.add(22);
+  Object[] objs = list1.toArray(); 
+  ```
+
+  > 如果我们希望将 list1 转换成 Integer[] 类型我们需要使用List中实现另外一个方法`<T> T[] toArray(T[] a);`
+
+- 将List 转换成指定类型的 数组
+
+  **`<T> T[] toArray(T[] a);`**  , a 是一个具体数组实例
+
+  ```
+  List<Integer> list1 = new ArrayList<>();
+  list1.add(11);
+  list1.add(22); 
+  // 将List 转换成 Object[] 类型数组
+  Object[] objs =  list1.toArray(); 
+  System.out.println(objs);
+  
+  // 将List 转换成指定类型的数组, 后面传一个数组即可
+  Integer[] array = list1.toArray(new Integer[0]);
+  System.out.println(array);
+  
+  // 打印:
+  [Ljava.lang.Object;@6d06d69c
+  [Ljava.lang.Integer;@7852e922
+  ```
+
+
+
+### 4、ArrayList 的遍历
+
+- 经典遍历
+
+  ```
+  List<Integer> array = new ArrayList<>();
+  array.add(11);
+  array.add(22);
+  array.add(33);
+  int size = array.size();
+  for(int i=0; i<size; i++){
+  	System.out.println(array.get(i));
+  }
+  ```
+
+  > 注意:
+  >
+  > 在获取List 的元素时, 只能通过 array.get(index), 来获取, 普通数组才能使用下标语法糖 array1[10]获取. 
+  >
+  > ```
+  > 不推荐这样写: 
+  > for(int i=0; i<array.size(); i++){
+  > 	System.out.println(array.get(i));
+  > }
+  > 
+  > 推荐这样写:
+  > int size = array.size();
+  > for(int i=0; i<size; i++){
+  > 	System.out.println(array.get(i));
+  > }
+  > ```
+
+
+
+- 迭代器遍历
+
+  ```
+  List<Integer> array = new ArrayList<>();
+  array.add(11);
+  array.add(22);
+  array.add(33);
+  
+  // 获取迭代器
+  Iterator<Integer> it = array.iterator();
+  while (it.hasNext()) {	// hasNext 的原理是判断size有没越界
+    Integer num = it.next();
+    System.out.println(num);
+  }
+  ```
+
+- for-each
+
+  ```
+  List<Integer> array = new ArrayList<>();
+  array.add(11);
+  array.add(22);
+  array.add(33);
+  
+  for (Integer i : array) {
+    System.out.println(i);
+  }
+  ```
+
+- List.forEach + lambda 遍历
+
+  函数式接口, 匿名类
+
+  ```
+  List<Integer> array = new ArrayList<>();
+  array.add(11);
+  array.add(22);
+  array.add(33);
+  // default void forEach(Consumer<? super T> action)
+  // 从forEach 的定义可以发现, forEach 需要传递一个 实现 Consumer 接口的对象
+  // Consumer 是一个函数式接口类型的接口
+  // 其实我们使用 lambda 表达式即可
+  array.forEach((item)->{
+    System.out.println(item);
+  });
+  
+  lambda简化
+  array.forEach((item)->System.out.println(item));
+  lambda 方法绑定
+  array.forEach(System.out::println);
+  
+  
+  // 匿名类实现遍历
+  List<Integer> array = new ArrayList<>();
+  array.add(11);
+  array.add(22);
+  array.add(33);
+  
+  // 匿名类 函数式接口
+  array.forEach(new Consumer<Integer>() {
+    @Override
+    public void accept(Integer t) {
+      System.out.println(t);
+    }
+  });
+  ```
+
+
+
+### 5、ArrayList 的扩容原理
+
+像以前, 我们使用一个数组时, 会先创建, 比如: `int[] nums = new int[5]` , 但是我们在使用ArrayList 的时候是没有指定ArrayList的容量, 比如:
+
+```
+ArrayList<Integer> nums = new ArrayList<>();
+nums.add(11);
+nums.add(22);
+nums.add(33);
+```
+
+其实是这样的,ArrayList内部是使用Array实现的, 它有个默认的容量, 支持动态扩容, 
+
+- ArrayList 的最小容量(默认容量)是10
+- 每次扩容时, 新容量是旧容量的1.5倍
+
+
+
+## 5、遍历
+
+
+
+### 1、for -each 格式, 的本质 Iterator
+
+```
+// for-each 格式
+for(元素类型 变量名 : 数组\iterable){
+	... ... 
+}
+```
+
+> List、Collection、Iterable、Set 都可以用 for-each遍历, 除了Map不行
+
+
+
+**说明:** for-each 的本质
+
+- 实现了**Iterable** 接口的对象, 都可以使用哪个 **for-each** 格式遍历元素
+
+  - 比如: List, Set. (Map 不行)
+
+- **Iterable** 在使用**for-each** 格式遍历元素时, 本质是使用了**Iterator对象** 
+
+  > 说白了, 下面两段代码是一样的
+  >
+  > ```
+  > for (Integer i : array) {
+  >   System.out.println(i);
+  > }
+  > 
+  > Iterator<Integer> it = array.iterator();
+  > while (it.hasNext()) {	
+  >   Integer num = it.next();
+  >   System.out.println(num);
+  > }
+  > 
+  > 即: for-each 只是 Iterator 的语法糖而已
+  > ```
+
+
+
+### 2、自定义 Iterable 、Iterator
+
+- for-each 的本质就是 Iterator
+
+- 自定一个实现Iterable 和 Iterator
+
+  ```
+  // 定义一个可遍历的类
+  class ClassRoom implements Iterable<String>{
+  	private String[] studentNames;
+  	
+  	// 自定义一个可变参数的构造方法 (可变参数的特定是保证是一个非null 的数组, 不论有没有用可变参数)
+  	public ClassRoom(String...studentNames) {
+  		this.studentNames = studentNames;
+  	}
+  	
+  
+  	// 实现Iterable 的接口方法
+  	@Override
+  	public Iterator<String> iterator() {
+  		return new ClassRoomIterator();
+  	}
+  	
+  	// 定义一个内部类, 实现 ClassRoom自己的Iterator
+  	private class ClassRoomIterator implements Iterator<String>{
+  
+  		private int cursor; // 游标
+  		@Override
+  		public boolean hasNext() {
+  			return cursor < studentNames.length;
+  		}
+  
+  		@Override
+  		public String next() {
+  			return studentNames[cursor++];
+  		}	
+  	}
+  }
+  
+  
+  void test1(){
+    // 测试可遍历类
+    ClassRoom room = new ClassRoom("zhagnsan", "lisi", "wangwu", "zhaoliu");
+    Iterator<String> it = room.iterator();
+    while(it.hasNext()) {
+      String name = it.next();
+      System.out.println(name);
+    }
+    
+    // 等价于下面, for-each 的本质是 Iterator, 我们平时写的 for-each 其实就是Iterator的语法糖
+    //for (String name : room) {
+    //  System.out.println(name);
+    //}
+  }
+  
+  // 打印:
+  zhagnsan
+  lisi
+  wangwu
+  zhaoliu
+  ```
+
+- 我们也可以使用 Iterator 的匿名类, 实现Iterator遍历
+
+  ```
+  class ClassRoom implements Iterable<String>{
+  	private String[] studentNames;
+  	
+  	public ClassRoom(String...studentNames) {
+  		this.studentNames = studentNames;
+  	}
+  	
+  	@Override
+  	public Iterator<String> iterator() {
+  		
+  		// 匿名类
+  		return new Iterator<String>() {
+  
+  			private int cursor; // 游标
+  			@Override
+  			public boolean hasNext() {
+  				return cursor < studentNames.length;
+  			}
+  
+  			@Override
+  			public String next() {
+  				return studentNames[cursor++];
+  			}
+  			
+  		};
+  	}
+  	 
+  }
+  ```
+
+### 3、可遍历的本质 Iterable Iterator
+
+- 其实, 不论是List 还是 Collection, 只要是实现了 **Iterable** 接口的类, 都是可遍历的
+- 为什么说, 实现了**iterable** 接口的类是可遍历的呢? 那是因为遍历的本质都是返回一个可迭代对象 **Iterator**
+
+- Iterator 接口定义如下:
+
+  ```
+  public interface Iterator<E> {
+    boolean hasNext();
+    E next();
+    // 其它 省略 ... 
+  }
+  ```
+
+- Iterable 接口定义如下:
+
+  ```
+  public interface Iterable<T> {
+    Iterator<T> iterator();
+  	// 其它 省略 ... 
+  }
+  ```
+
+  
+
+### 4、遍历 的 同时删除元素 Iterator
+
+要求:
+
+通过遍历的方式, 挨个删除所有的元素
+
+> 如果删除所有元素, 我们可以直接调用 `clear()` 方法删除, 在List接口中有`clear()`的定义
+
+- 像我们使用下面几种方法来删除元素, 都是有问题的, 如下:
+
+  ```
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  nums.add(11);
+  nums.add(22);
+  nums.add(333);
+  nums.add(444);
+  
+  // 删除不完
+  for (int i = 0; i < nums.size(); i++) {
+    nums.remove(i);
+  }
+  System.out.println(nums);
+  // 打印:
+  [22, 444]
+  
+  
+  // 报错 ConcurrentModificationException
+  for (Integer num : nums) {
+    nums.remove(num);
+  }
+  
+  // 报错 ConcurrentModificationException
+  nums.forEach((num)->{
+    nums.remove(num);
+  });
+  ```
+
+- **如果想要在遍历元素的时候, 依次删除元素的话, 我们只能使用Iterator 的remove 方法, 如下:**
+
+  ```
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  nums.add(11);
+  nums.add(22);
+  nums.add(333);
+  nums.add(444);
+  
+  Iterator<Integer> it =  nums.iterator();
+  System.out.println("----------");
+  while (it.hasNext()) {
+    Integer num =  it.next();
+    System.out.println(num);
+    it.remove(); //注意, 在调用Iterator 的remove方法前必须先调用 next 方法
+  }
+  
+  System.out.println("----------");
+  System.out.println(nums);
+  
+  // 打印:
+  ----------
+  11
+  22
+  333
+  444
+  ----------
+  []
+  ```
+
+**补充**
+
+- 如果在遍历集合元素的时候, 使用了集合自带的方法修改集合的长度 (比如: add, remove 等方法)
+
+  那么可能会抛出`java.util.ConcurrentModificationException`异常
+
+**结论:**
+
+- 所以, 如果以后想要在遍历数组的时候删除元素, 请使用迭代器
+
+
+
+> 虽然我们刚才介绍了, 如果我们可以通过迭代器 Iterator 在遍历元素的同时删除元素不会报错, 但是我们通过查看SDK发现迭代器只提供了删除元素功能, 是没有提供添加元素的功能, 如果我们在使用迭代器在遍历的时候又想添加元素要怎么做呢? 这就要看我们后面介绍的**ListIterator** 了.
+
+
+
+### 5、遍历的时候添加元素 ListIterator
+
+- 前面我们介绍了**Iterator** 可以编译元素, 可以删除元素.
+- **ListIterator**  继承自 **Iterator** 在**Iterator** 的基础上增加了一些功能. 
+
+
+
+> Iterator 接口主要的功能定义:
+>
+> ```
+> public interface Iterator<E> {
+> 	boolean hasNext();
+> 	E next();
+> 	default void remove() {
+>       throw new UnsupportedOperationException("remove");
+>   }
+>   default void forEachRemaining(Consumer<? super E> action) {
+>       Objects.requireNonNull(action);
+>       while (hasNext())   action.accept(next());
+>   }
+> }
+> ```
+>
+> ListIterator 继承自 Iterator, 其定义如下:
+>
+> ```
+> public interface ListIterator<E> extends Iterator<E> {
+> 	boolean hasNext();
+> 	E next();
+> 	boolean hasPrevious();
+> 	E previous();
+> 	int nextIndex();
+> 	int previousIndex();
+> 	void remove();		// 删除当前 cursor指向的元素
+> 	void set(E e);		// 修改当前 cursor指向的元素
+> 	void add(E e);
+> }
+> ```
+
+
+
+- ListIterator 示例:
+
+  ```
+  // 示例1:
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  nums.add(11);
+  nums.add(22);
+  nums.add(333);
+  nums.add(444);
+  
+  ListIterator<Integer> it = nums.listIterator();
+  while (it.hasNext()) {
+     System.out.println(it.next());
+  }
+  
+  while(it.hasPrevious()) {
+    System.out.println(it.previous());
+  }
+  
+  // 示例2
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  nums.add(11);
+  nums.add(22);
+  nums.add(333);
+  nums.add(444);
+  
+  ListIterator<Integer> it = nums.listIterator();
+  while (it.hasNext()) {
+     System.out.println(it.next() + 30);
+  }
+  
+  System.out.println(nums);
+  // 打印:
+  41
+  52
+  363
+  474
+  [11, 22, 333, 444]
+  
+  
+  // 示例3:
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  nums.add(11);
+  nums.add(22);
+  nums.add(333);
+  nums.add(444);
+  
+  System.out.println("--------");
+  ListIterator<Integer> it = nums.listIterator();
+  while (it.hasNext()) {
+     it.add(99);
+     System.out.println(it.next());
+     it.add(88);
+  }
+  System.out.println("--------");
+  System.out.println(nums);
+  
+  // 打印: 有点意思
+  --------
+  11
+  22
+  333
+  444
+  --------
+  [99, 11, 88, 99, 22, 88, 99, 333, 88, 99, 444, 88]
+  ```
+
+
+
+## 6、ArrayList 中的其它常用方法
+
+### 1、public void trimToSize() 方法
+
+在将**trimToSize() 方法**  的用法前, 我们就要先提一下**ArrayList** 的底层原理了.
+
+>  在优化程序性能时, 此方法很有用
+
+- 首先我们知道 ArrayList 是java中的一种数据结构, 是一种动态数组, 具备动态扩容和缩容的功能, 其底层是使用普通数组实现(而不是链表). ArrayList的默认容量是10, 即当你初始化一个ArrayList对象时, ArrayList内部就会持有一个长度为10 的数组, 这时数组内存储的都是 `null` , 当我们往ArrayList 中添加对象`(add(E element)`时, 如果ArrayList发现其内部的数组已经装满了时, 他会将内部持有的数组扩容为原来长度的 1.5倍.
+
+  当我们在调用ArrayList的`clear()` 方法时, `clear()` 方法会将ArrayList内持有的数组的所有元素设置为`null` 这样ArrayList内部就清空了, 但是, 但是此时ArrayList 内持有的数组还是原来的长度, 如果后续过程中我们只向Arraylist中存储少量的元素时, 那么将造成大量的存储空间浪费, 这时我们的**trimToSize()** 方法就上场了.
+
+  **一句话, ArrayList 中的 trimToSize() 方法的功能就是对 ArrayList 中持有的数组进行缩容操作, 避免存储空间浪费** , trimToSize() 后ArrayList中的数组的长度就是ArrayList的size大小
+
+  ```
+  // trimToSize()定义如下
+  public void trimToSize() {
+      modCount++;
+      if (size < elementData.length) {
+          elementData = (size == 0)
+            ? EMPTY_ELEMENTDATA
+            : Arrays.copyOf(elementData, size);
+      }
+  }
+  ```
+
+  
+
+
+
+### 2、public void ensureCapacity(int minCapacity)
+
+简单的说**ensureCapacity(int minCapacity)** 方法的作用就是确保 ArrayList 中的数组有指定长度的容量
+
+- 其实, ArrayList 中的 **ensureCapacity** 的原理是这样的, 我们知道ArrayList 的实现原理是内部持有一个数组 且这个数组默认的长度为10 , 当我们想ArrayList 中添加元素时, 如果ArrayList 中的数组的容量不足时是按照1.5倍的方式进行扩容的, 如果我们要想一个ArrayList 中存入大量的数据时默认情况下扩容操作就很频繁, 这样就会存在很多不必要的开销, 如果我们知道大概要存储多少条数据时, 我们就可以在存储数据时使用 **ensureCapacity**  方法对数组进行容量确保(扩容) 操作, 这样后续存储数据时, 就不必频繁的做扩容操作了, 提高性能.
+
+  ```
+  ArrayList<Integer> arr = new ArrayList<Integer>();  // 默认容量10
+  arr.ensureCapacity(100); // 保证 ArrayList 的容量至少有100
+  
+  ArrayList<Integer> arr2 = new ArrayList<Integer>(1000); // 创建一个默认容量是 1000的
+  ```
+
+  > ```
+  > // ensureCapacity 的定义如下:
+  > public void ensureCapacity(int minCapacity) {
+  >     int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) 
+  >     								? 0: DEFAULT_CAPACITY;
+  >     if (minCapacity > minExpand) {
+  >         ensureExplicitCapacity(minCapacity);
+  >     }
+  > }
+  > ```
+
+**简单的说, ensureCapacity 就是对ArrayList 进行扩容, 容量保证操作** 
+
