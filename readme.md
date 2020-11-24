@@ -1,4 +1,4 @@
-#    aeclipse 快捷键
+#      eclipse 快捷键
 
 - eclipse 中 导 包 的快捷键`ctrl + shift + o` , 也可以用`ctrl + 1` 来修复
 
@@ -3466,13 +3466,17 @@ System.out.println(Arrays.toString(array));
 
 # 十四、Lambda Expression
 
-## 1、函数式接口介绍
 
-- Lambda 表达式是java8开始才有的语法
 
-- 函数式接口(function interface) : 只包含一个抽象方法的接口
+## 1、函数式接口 
 
-  > 简单的说, 在java中我们把只包含一个抽象方法的接口称之为函数式接口, 即函数式接口中只有一个抽象方法
+### 1、函数式接口介绍
+
+- **Lambda 表达式是java8开始才有的语法**
+
+- **函数式接口(function interface) : 只包含一个抽象方法的接口**
+
+  > 简单的说, 在java中我们把只包含一个抽象方法的接口称之为函数式接口, **即函数式接口中只有一个抽象方法**
 
   ```
   // 下面这个接口我们称之为 函数式接口, 因为接口中只包含一个抽象方法
@@ -3487,7 +3491,7 @@ System.out.println(Arrays.toString(array));
   }
   ```
 
-  - 在java开发中, 如果我们定义的是函数式接口, 一般我们会建议添加上`@FunctionalInterface` 注解, 它表示是一个函数式接口
+  - **在java开发中, 如果我们定义的是函数式接口, 一般我们会建议添加上`@FunctionalInterface` 注解, 它表示是一个函数式接口**
 
     ```
     @FunctionalInterface
@@ -3496,7 +3500,464 @@ System.out.println(Arrays.toString(array));
     }
     ```
 
-当我们使用匿名类实现的是函数式接口时, 可以使用**Lambda表达式进行简化** 
+
+
+**当我们使用匿名类实现的是函数式接口时, 可以使用Lambda表达式进行简化** 
+
+
+
+### 2、JDK常用函数式接口
+
+- **在`java.util.function` 包中提供了很多常用的函数式接口**
+  - Supplier
+  - Consumer
+  - Predicate
+  - Function
+  - ... ... 
+
+#### 1、Supplier 接口应用
+
+> supplier 的翻译是供应商的意思
+
+- 有时使用`Supplier` 传参, 可以避免代码的浪费执行(有必要的时候再执行)
+
+  ```
+  // Supplier 接口的定义如下
+  @FunctionalInterface
+  public interface Supplier<T> {
+      T get();
+  }
+  ```
+
+- 在使用 `Supplier` 接口前我们的代码是这样的
+
+  ```
+  // 获取第一个非空的字符串
+  	static String getFirstNotEmptyString(String s1, String s2) {
+  		if (s1 != null && s1.length() > 0) return s1;
+  		if (s2 != null && s2.length() > 0) return s2;
+  		return null;
+  	}
+  	
+  	static  String makeString() {
+  		System.out.println("---do make string");
+  		return "string 2";
+  	}
+  	
+  	public static void main(String[] args){
+  		 String str1 = "string 1";
+  		 
+  		 System.out.println(getFirstNotEmptyString(str1, makeString()));
+  	}
+  	// 打印结果:
+  	---do make string   // 这句没必要执行, 却执行了, 浪费资源
+  	string 1
+  	
+  	// 从上面的打印结果我们发现, 在getFirstNotEmptyString 方法中, 不论前面的 str1 是否为空, 
+  	// 都会执行第二个参数及makeString()
+  	// 我们想要实现的是类似 短路与&&  或者逻辑或这种短路操作, 这时我们就可以使用
+  	// Supplier 
+  ```
+
+- **使用 `supplier` 函数式接口, 改进我们的代码**, 如下:
+
+  ```
+  // 获取第一个非空的字符串
+  static String getFirstNotEmptyString(String s1, Supplier<String> sippler2) {
+    if (s1 != null && s1.length() > 0) return s1;
+    String s2 =  sippler2.get();
+    if (s2 != null && s2.length() > 0) return s2;
+    return null;
+  }
+  
+  static  String makeString() {
+    System.out.println("---do make string");
+    return "string 2";
+  }
+  
+  public static void main(String[] args){
+     String str1 = "string 1"; 
+     System.out.println(getFirstNotEmptyString(str1, new Supplier<String>() {
+      @Override
+      public String get() { 
+        return makeString();
+      }
+    }));
+  }
+  	
+  	
+  // 打印结果:
+  string 1 // 很理想, 没有执行多余的操作
+  	
+  // 使用lambda 表达式改进
+  public static void main(String[] args){
+     String str1 = "string 1"; 
+     System.out.println(getFirstNotEmptyString(str1, ()->makeString()));
+  }
+  // 打印结果:
+  string 1
+  ```
+
+  
+
+  
+
+#### 2、Consumer 接口 accept
+
+- 定义如下
+
+  ```
+  @FunctionInterface
+  public interface Consumer<T>{
+  	void accept(T t);
+  	default Consumer<T> andThen(Consumer<? super T> after) {
+          Objects.requireNonNull(after);
+          return (T t) -> { accept(t); after.accept(t); };
+      }
+  }
+  ```
+
+- Consumer 接口的应用过
+
+  ```
+  // 封装一个遍历方法来给外部遍历数组, 让外部处理要做的事情
+  // Consumer 的功能就是提供要处理的 对象给外面, 让外面处理
+  static void  myForEach(int[] nums, Consumer<Integer> consumer) {
+    if (nums == null || consumer == null) return;
+  
+    for (Integer num : nums) {
+      if (num >= 22) {
+        consumer.accept(num);
+      }
+      else {
+        consumer.accept(num + 200);
+      }
+    }
+  }
+  
+  // 打印:
+  消费: 211
+  消费: 22
+  消费: 33
+  ```
+
+  > 其实在ArrayList 中的实例方法`forEach`  就实现了 `Comsumer` 函数式接口的方法
+
+
+
+#### 3、Consumer - andThen
+
+```
+// 封装一个遍历方法来给外部遍历数组, 让外部处理要做的事情
+// Consumer 的功能就是提供要处理的 对象给外面, 让外面处理
+static void  myForEach(int[] nums, 
+             Consumer<Integer> consumer1, 
+             Consumer<Integer> consumer2) {
+  if (nums == null || consumer1 == null || consumer2 == null) return;
+
+  for (Integer num : nums) {
+     consumer1.andThen(consumer2).accept(num);
+     // 相当于 先执行 consumer1.accept(num);
+     // 再执行 consumer2.accept(num);
+  }
+}
+
+public static void main(String[] args) {
+  int[] arr = {11, 22, 33};
+  myForEach(arr, 
+      (c1)->{
+        System.out.println("consumer1: " + c1);
+      },
+      (c2) ->{
+        System.out.println("consumer2 " + c2);
+      });
+}
+
+// 打印
+consumer1: 11
+consumer2 11
+consumer1: 22
+consumer2 22
+consumer1: 33
+consumer2 33
+```
+
+
+
+#### 4、Predicate 应用
+
+- Predicate 接口的定义
+
+  > Predicate 的翻译是谓词, 一般是用来做条件过滤的, 具体方法过滤的条件由外部(lambda)提供
+
+  ```
+  @FunctionalInterface
+  public interface Predicate<T> {
+      boolean test(T t); 		// 表示 t 满足某个条件为 true 时执行
+      default Predicate<T> and(Predicate<? super T> other) { // 想当与是 && 
+          Objects.requireNonNull(other);
+          return (t) -> test(t) && other.test(t);
+      }
+      default Predicate<T> negate() { // ! test();
+      		// 想当于, 你给我一个 Predicate(里面有个test),
+          // 我返回一个Predicate(里面有个test, 刚好和原来的test 取反)
+          return (t) -> !test(t);		
+      }
+      default Predicate<T> or(Predicate<? super T> other) { // 相当于是 || 
+          Objects.requireNonNull(other);
+          return (t) -> test(t) || other.test(t);
+      }
+  }
+  ```
+  
+- 应用
+
+  ```
+  static String join(int[] nums, Predicate<Integer> p) {
+    if (nums == null || p == null) {
+      return null;
+    }
+  
+    StringBuilder sb = new  StringBuilder();
+    for (int n : nums) {
+      if (p.test(n)) {
+        sb.append(n).append("_");
+      }
+    }
+    sb.deleteCharAt(sb.length()-1);
+    return sb.toString();
+  }
+  
+  public static void main(String[] args) {
+     int[] arr = {11, 22, 33, 44, 55, 66};
+     String rst = join(arr, (num)->{
+      return num % 2 == 0 ;
+     });
+     System.out.println(rst);
+  }
+  
+  // 打印:
+  22_44_66
+  ```
+
+
+
+#### 5、Predicate - and
+
+```
+static String join(int[] nums, Predicate<Integer> p1, Predicate<Integer> p2) {
+  if (nums == null || p1 == null || p2 == null) return null;
+
+  StringBuilder sb = new  StringBuilder();
+  for (int n : nums) {
+    if (p1.and(p2).test(n)) { // 相当于 p1.test(n) && p2.test(n)
+
+      sb.append(n).append("_");
+    }
+  }
+  sb.deleteCharAt(sb.length()-1);
+  return sb.toString();
+}
+
+public static void main(String[] args) {
+   int[] arr = {11, 22, 33, 44, 55, 66, 77, 88};
+   String rst = join(arr, (num)->{
+    return num % 2 == 0 ;
+   }, (num2)->{
+     return num2 < 70;
+   });
+   System.out.println(rst);
+}
+
+// 打印:
+22_44_66
+```
+
+
+
+#### 6、Predicate - or
+
+```
+public static void main(String[] args) {
+   int[] arr = {11, 22, 33, 44, 55, 66, 77, 88};
+   String rst = join(arr, (num)->{
+    return num % 2 == 0 ;
+   }, (num2)->{
+     return num2 % 3 == 0;
+   });
+   System.out.println(rst);
+}
+	  
+static String join(int[] nums, Predicate<Integer> p1, Predicate<Integer> p2) {
+  if (nums == null || p1 == null || p2 == null) return null;
+
+  StringBuilder sb = new  StringBuilder();
+  for (int n : nums) {
+    if (p1.or(p2).test(n)) { // 相当于 p1.test(n) || p2.test(n)
+
+      sb.append(n).append("_");
+    }
+  }
+  sb.deleteCharAt(sb.length()-1);
+  return sb.toString();
+}
+
+// 打印:
+22_33_44_66_88
+```
+
+
+
+#### 7、Predicate - negate
+
+```
+public static void main(String[] args) {
+   int[] arr = {11, 22, 33, 44, 55, 66, 77, 88};
+   String rst = join(arr, (num)->{
+    return num % 2 == 0 ;
+   });
+   System.out.println(rst);
+}
+
+static String join(int[] nums, Predicate<Integer> p) {
+  if (nums == null || p == null) return null;
+  StringBuilder sb = new  StringBuilder();
+  for (int n : nums) {
+    if (p.negate().test(n)) { // 相当于 ! p1.test(n) 
+      sb.append(n).append("_");
+    }
+  }
+  sb.deleteCharAt(sb.length()-1);
+  return sb.toString();
+}
+// 打印:
+11_33_55_77
+```
+
+
+
+#### 8、Function  接口
+
+> 一般是这种 一个数据需要转换成另外一种数据的, 需要外部提供转换方法的就用Function接口
+
+- **接口定义入下:**
+
+  ```
+  @FunctionalInterface
+  public interface Function<T, R> {
+  
+      R apply(T t);
+      
+      default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+          Objects.requireNonNull(before);
+          return (V v) -> apply(before.apply(v));
+      }
+      default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+          Objects.requireNonNull(after);
+          return (T t) -> after.apply(apply(t));
+      }
+      static <T> Function<T, T> identity() {
+          return t -> t;
+      }
+  }
+  ```
+
+#### 9、Function - apply
+
+- 匿名类实现
+
+  ```
+  public static void main(String[] args) { 
+  		 
+    String[] strs = {"111", "222", "333", "444", null, "555"};
+    int rst = sum(strs, new Function<String, Integer>() {
+      @Override
+      public Integer apply(String t) { 
+        if (t== null)  return 0;
+        return  Integer.valueOf(t) / 100;
+  
+      }
+    });
+    System.out.println(rst);
+  }
+  
+  // 计算 数组 strs 的和, 具体怎么计算, 由 你提供的 func 对象的 apply 方法决定
+  // 相当于让你提供一个方法 Integer apply(String);
+  static int sum(String[] strs, Function<String, Integer> func) {
+  
+    if (strs == null || func == null) return 0;
+    int result = 0;
+    for(String str : strs) {
+      Integer rst = func.apply(str);
+      result += rst;
+    }
+    return result;
+  }
+  
+  // 打印结果:
+  15
+  ```
+
+- lambda表达式实现
+
+  ```
+  public static void main(String[] args) { 
+    String[] strs = {"111", "222", "333", "444", null, "555"};
+    int rst = sum(strs, (str)->{
+      if ( str == null)  return 0;
+      return  Integer.valueOf(str) / 100;
+    });
+  
+    System.out.println(rst);
+  }
+  
+  // 打印: 
+  15
+  ```
+
+- Lambda  简化实现
+
+  ```
+  String[] strs = {"111", "222", "333", "444","555"};
+  // 使用 Integer::valueOf 方法绑定, 输入不可以有 null
+  int rst = sum(strs, Integer::valueOf);
+  System.out.println(rst);
+  
+  // 打印
+  1665
+  ```
+
+  
+
+#### 10、Function - andThen 接口
+
+```
+// 将所有的个位数 加起来
+int sum(String[] strs, Function<String, Integer> func1, Function<Integer, Integer> func2){
+	if(strs == null || func1 == null || func2 == null) return 0;
+	int result = 0;
+	for(String str : strs){
+		result += func1.andThen(func2).apply(str); // 相当于 func2.apply(func1.apply(str));
+	}
+	return result;
+}
+```
+
+
+
+#### 11、Function - compose 接口
+
+```
+// 将所有的个位数 加起来, 与 andThen刚好 反起来
+int sum(String[] strs, Function<String, Integer> func1, Function<Integer, Integer> func2){
+	if(strs == null || func1 == null || func2 == null) return 0;
+	int result = 0;
+	for(String str : strs){
+		result += func1.compose(func2).apply(str); // 相当于 func1.apply(func2.apply(str));
+	}
+	return result;
+}
+```
 
 
 
@@ -7784,7 +8245,7 @@ public class Box<E>{
 }
 
 // 泛型方法
-<T> void addBox(T element, List<Box<T>> boxes){
+static <T> void addBox(T element, List<Box<T>> boxes){
 	Box<T> box = new Box<>(element);
 	boxes.add(box);
 }
@@ -8131,7 +8592,472 @@ class Student<T extends Comparable<T>> implements Comparable<Student<T>>{
 
 
 
+## 6、通配符 (Wildcards)
 
+
+
+### 1、介绍泛型中的通配符 
+
+- **在泛型中, 问号(?) 被称为通配符**
+  - **通常被用作变量类型 、返回值类型的类型参数**
+- **泛型中的通配符(?) 不能用作方形方法, 泛型类型实例化, 泛型类型定义的类型参数**
+
+ 
+
+在讲通配符(?)前, 我们先来介绍一个常见的错误, 如下:
+
+```
+class  Box<E>{
+}
+
+public class Main {
+	public static void main(String[] args) {
+		Box<Integer> box1 = new Box<>();
+		Box<String> box2 = new Box<>();
+		Box<Object> box3 = new Box<>();
+		// 下面的操作是错误的, Box<Integer> Box<String> Box<Object> 这三者之间是关系的
+		// 虽然原始类型都是Box, 但是三者是不同的类型
+		showBox(box1);
+		showBox(box2);
+	}
+	
+	static void showBox(Box<Object> box) {
+	}
+}
+```
+
+> `Box<Integer>`  、`Box<String>`、` Box<Object>` 这三者代表的是不同的类型, 注意下
+>
+> `Box<Integer>`  和 `Box<String>`不是 ` Box<Object>` 的子类型
+
+正确的一种做法,可以是下面这种
+
+> 将showBox() 方法改为 泛型方法, 如下:
+
+```
+public class Main {
+	public static void main(String[] args) {
+		Box<Integer> box1 = new Box<>();
+		Box<String> box2 = new Box<>();
+		Box<Object> box3 = new Box<>();
+		
+		showBox(box1);
+		showBox(box2);
+		showBox(box3);
+	}
+	
+	static <T> void showBox(Box<T>box) {
+	}
+}
+```
+
+如果我们想对泛型方法`static <T> void showBox(Box<T>box)` 中的`T` 做一点限制要求, 我们可以这样写
+
+```
+public class Main {
+	public static void main(String[] args) {
+		Box<Integer> box1 = new Box<>();
+		Box<String> box2 = new Box<>();
+		Box<Object> box3 = new Box<>();
+		
+		showBox(box1);
+		showBox(box2);	// 错误
+		showBox(box3);  // 错误
+	}
+	
+	static <T extends Number> void showBox(Box<T>box) {
+	}
+}
+```
+
+**如果我们不想将原来的方法改成泛型方法, 用下面的方式也是可以的, 如下:**
+
+```
+public class Main {
+	public static void main(String[] args) {
+		Box<Integer> box1 = new Box<>();
+		Box<String> box2 = new Box<>();
+		Box<Object> box3 = new Box<>();
+		
+		showBox(box1);  // ok
+		showBox(box2);	// ok
+		showBox(box3);  // ok
+	}
+	
+	static  void showBox(Box<? extends Number>box) {
+	}
+}
+```
+
+**上面的这种操作叫做, 通配符** , 下面我们会详细介绍通配符
+
+
+
+### 2、通配符 - 上界
+
+- 可以通过**extends** 设置 **类型参数的上界**
+
+  ```
+  // 类型参数必须是 Number 类型 或者 是 NUmber的子类型
+  void testUpper(Box<? extends Number> box){}
+  
+  Box<Integer> p1 = null;
+  Box<Number> p2 = null;
+  Box<? extends Number> p3 = null;
+  Box<? extends Integer> p4 = null;
+  testUpper(p1);
+  testUpper(p2);
+  testUpper(p3);
+  testUpper(p4);
+  ```
+
+  > 什么是类型参数的上界呢? 
+  >
+  > 如上面的定义`void testUpper(Box<? extends Number> box)` , 表示类型参数占位符`?`表示的只能是 `Number` 类型或者是 `Number` 的子类型, 这就称为类型参数的上界
+
+  再比如说, 以前我们是这样来使用泛型类型的, 如下:
+
+  ```
+  Box<Integer> box1 = new Box<>();
+  Box<String> box2 = new Box<>();
+  // 如上, 以前我们泛型是这样定义的, 一旦定义后 box1 只能指向 Box<Integer>类型的对象
+  // box2 只能执行 Box<String> 类型的对象, 又因 `Box<Integer>` 与 `Box<String> 是不同类型的数据
+  // 所以 这样的操作就很死板, 因次下面的操作是错误的
+  box2 = box1; // 错误, 类型不对
+  box1 = box2; // 错误, 类型不对
+  
+  // 但是下面的操作就完全没问题
+  Box<Number> box3 = new Box<>();
+  Box<? extends Number> box4 = new Box<>();
+  box4 = box3; // ok , 因为box3中的泛型类型参数NNumber
+  box4 = box1; // ok , 因为box1中的泛型类型参数是Integer, 是 Number 的子类
+  box4 = box2; // 错误, 因为box2中的泛型类型参数是 String, 不是Number 的子类
+  
+  ```
+
+  **从上面的示例, 我们发现: `<? extends Number>` 比 `<T>` 在使用中灵活的多, 通用性更强** 
+
+
+
+- 泛型参数类型 通配符上界 示例
+
+  ```
+  public static void main(String[] args) {
+  		
+    List<Integer> is = Arrays.asList(1,2,3); 
+    System.out.println(sum(is)); // 7.0 
+  
+    List<Double> ds = Arrays.asList(1.1, 1.2, 1.5);
+    System.out.println(sum(ds)); // 3.8
+  }
+  static double sum(List<? extends Number> list){
+    double s = 0.0;
+    for (Number num : list){
+      s += num.doubleValue();
+    }
+    return s;
+  }
+  ```
+
+
+
+
+
+### 3、通配符- 下界
+
+- 前面我们已经介绍了, 可以使用通配符上界的方式来动态的描述一个泛型类, 当然在java中自然也有通配符上界
+- 在java中, 我们使用的是关键字**extends** 来描述通配符的上界, 用 **super** 关键字来描述通配符下界
+
+> 通配符上界描述的是指定的某个类型或者对应类型的子类
+>
+> 统配符下界描述的就是指定的某个类型或者对应类型的父类
+
+示例如下: 
+
+```
+// 类型参数 必须是 Integer 或者Integer 的父类
+class Box<E>{}
+void testLower(Box<? super Integer> box){}
+// ? 表示可以是 Integer 或者Integer 的父类
+
+Box<Integer> box1 = null;
+Box<Number> box2 = null;
+Box<? super Integer> box3 = null;
+Box<? super Number> box4 = null;
+
+testLower(box1); // ok
+testLower(box2); // ok
+testLower(box3); // ok
+testLower(box4); // ok
+```
+
+
+
+### 4、通配符- 无限制
+
+- 前面我们介绍了 **通配符-上界** 、**通配符-下界** , 现在我们来介绍一个**通配符-无限制**
+
+  - 通配符上界, 要求泛型参数类型必须是具体类或者其子类型, 通配符下界要求泛型类型参数必须是具体类型或者其父类型
+
+  - 所谓通配符无限制, 就是不对泛型类型参数的类型做限制, 任何类型都可以
+
+    > 注意: 
+    >
+    > 虽然统配符无限制表示的是任何类型都可以, 但是和反向的原始类型还是有严格的区分的哈, 不一样
+
+  ```
+  // 泛型的参数类型是什么类型都可以
+  class  Box<E>{}
+  
+  static void test(Box<?> box) {}
+  
+  public static void main(String[] args) {
+    Box<Integer> box1 = new Box<>();
+    Box<Number> box2 = new Box<>();
+    Box<? extends Number> box3 = new Box<>();
+    Box<? super Integer> box4 = new Box<>();
+    Box<String> box5= new Box<>();
+    Box<? extends string> box6 = new Box<>();
+    Box<?> box7 = new Box<>();
+    Box box8 = new Box(); 
+  
+    test(box1);	// ok
+    test(box2); // ok
+    test(box3); // okv
+    test(box4); // ok
+    test(box5); // ok
+    test(box6); // ok
+    test(box7); // ok
+    test(box8); // ok
+  }
+  ```
+
+  
+
+### 5、通配符- 继承
+
+![](images/fxtpjc.jpg) 
+
+### 6、通配符注意点
+
+- **前面我们介绍了, 在java中 (?) 是作为泛型类型参数的通配符**
+
+- **通配符可以作为方法的参数, 变量的类型, 做方法的返回值类型**
+
+  ```
+  // 通配符做方法的参数
+  static void test(Box<? extends Number> box) {
+  }
+  
+  // 统配符作为变量的参数
+  Box<? super String> box = new box<>()
+  
+  // 通配符做方法的返回值类型
+  static Box<?>  test(Box<?> box) {
+    return null;
+  }
+  ```
+
+  > **注意:**
+  >
+  > 不要将泛型方法 与 通配符作为函数的返回值弄混了, 他们是有本质区别的
+  >
+  > - 泛型方法中的泛型参数类型是对参数类型的一种占位定义, 是一种占位定义
+  > - 而, 泛型通配符作为方法的返回值类型,  是对返回值的一种描述
+  >
+  > ```
+  > // 泛型方法
+  > static <T> void addBox(T element, List<Box<T>> boxes){
+  > 	Box<T> box = new Box<>(element);
+  > 	boxes.add(box);
+  > }
+  > 
+  > // 通配符做方法的返回值类型
+  > static Box<?>  test(Box<?> box) {
+  >   return null;
+  > }
+  > ```
+
+- **通配符不能用作泛型类型实例化, 泛型方法调用, 泛型类型定义的类型参数**
+
+  - 泛型方法实例化
+
+    ```
+    // 泛型类型实例化
+    Box<Integer> box1 = new Box<Integer>();  // 右边的 new Box<Integer>();操作称为泛型类型实例化
+    // Box<?> box1 = new Box<?>(); 错误, 通配符不能实例化
+    ```
+
+  - 泛型方法调用
+
+    ```
+    public class Main{
+    	// 定义泛型方法
+    	static <T1, T2> void set(Student<T1, T2> stu, T1 age, T2 height){
+    		stu.age = age;
+    		stu.height = height;
+    	}
+    	
+    	public static void main(String[] args){
+    		Student<Integer, Double> stu = new Student<>();
+    		set(stu, 10, 1.88); // 调用泛型方法的简写
+    		Main.<Integer, Double>set(stu, 10, 1.888); // 调用泛型方法的完整写法
+    		
+    		//  调用泛型方法的错误写法
+    		// Main.<?, ?>set(stu, 10, 1.888);  
+    		
+    	}
+    }
+    
+    // 定义泛型类
+    class Student<T1, T2>{
+    	public T1 age;
+    	public T2 height;
+    }
+    ```
+
+  - 定义泛型类型是, 不能使用通配符
+
+    ```
+     // 定义泛型类
+    class Student<? extends Number>{
+    }	 
+    
+    // 只能写成
+    class Student<T extends Number>{
+    }	
+    // ? 代表的是通配类型, T代表的是某一具体类型
+    ```
+
+    
+
+  
+
+### 7、通配符 注意点2
+
+```
+// 这样使用泛型时可以的
+static void foo(List<Integer> list){
+	Integer obj = list.get(0);
+	list.set(0, obj);					//ok		
+	list.set(0, list.get(0)); //ok
+}
+
+// 下面这种使用通配符是不可以的
+static void foo2(List<?> list){
+	Integer obj = list.get(0);
+	list.set(0, obj);						// error obj 的真实类型不确定报错
+	list.set(0, list.get(0));		// error obj 的真实类型不确定报错
+}
+```
+
+> 后面这foo2方法为什么报错呢?
+> 因为List 的set 方法在编译时要求 obj 的类型是确定的, 但是因为obj 是 List<?>中的一个是不确定的, 因此报错
+
+那要如何解决foo2 中编译报错的问题呢? 只需要把方法改为泛型方法即可, 如下:
+
+```
+static <T> void foo3(List<T> list){
+	Integer obj = list.get(0);
+	list.set(0, obj);						// ok
+	list.set(0, list.get(0));		// ok
+}
+```
+
+
+
+## 7、泛型的使用限制
+
+- 基本类型不能作为泛型的类型参数
+
+  ```
+  Map<int, double> map1 = new HashMap<>(); // error
+  Map<Integer, Double> map1 = new HashMap<>(); // ok
+  ```
+
+- 不能创建类型参数的实例
+
+  ```
+  public class Box<E>{
+  	public void add(Class<E> cls) throw Exception{
+  		E e1 = new E(); // error, 不可以这么干
+  		E e2 = cls.newInstance(); // ok
+  	}
+  }
+  ```
+
+- 不能定义类型为类型参数的静态变量
+
+  ```
+  public class Box<E>{
+  	private static E value; // error 不可以
+  	private E age; // ok
+  }
+  Box<Integer> box1 = new Box<>();
+  Box<String> box2 = new Box<>();
+  System.out.prinntln(box1.value);
+  System.out.prinntln(box2.value);
+  // 请问静态变量value是什么类型的?  Integer 还是 String ???!!! 错误
+  
+  // E 是依赖于实例对象的, 没有实例没有意义
+  ```
+
+- 类型参数不能跟 `instanceof` 一起使用
+
+  ```
+  ArrayList<Integer> list = new ArrayList<>();
+  if(list instanceof ArrayList<Integer>){ // error , 不能这么写
+  
+  }
+  ```
+
+- 不能创建带有类型参数的数组
+
+  ```
+  Box<Integer>[] boxes1 = new Box<Integer>[4]; // error
+  Box<Integer>[] boxes2 = new Box<>[4]; // error
+  Box<Integer>[] boxes3 = new Box[4]; // ok
+  ```
+
+- 下面的重载是不允许的
+
+  ```
+  void test(Box<Integer> box){}
+  void test(Box<String> box){}
+  ```
+
+- 不能定义泛型的异常类
+
+  ```
+  public class MyException<T> extends Exception{
+  }
+  ```
+
+- catch 的异常类型, 不能用类型参数
+
+  ```
+  public static <T extends Exception> void test(Box<T> box){
+  	try{
+  		
+  	}
+  	catch(E e){ // error
+  	
+  	}
+  }
+  
+  ```
+
+- 下面的代码是可以的
+
+  ```
+  class Parser<T extends Exception>{
+  	public void parse(File file) throw T{ // ok 
+  	
+  	}
+  }
+  ```
+
+  
 
 # 二四、集合 (Collections)
 
@@ -8944,4 +9870,670 @@ for(元素类型 变量名 : 数组\iterable){
   > ```
 
 **简单的说, ensureCapacity 就是对ArrayList 进行扩容, 容量保证操作** 
+
+
+
+## 7、LinKedList 
+
+### 1、LinkedList 介绍
+
+![](images/shhujujiegou.jpg) 
+
+- **LinkedList  与ArrayList 很像都是实现了 List 接口的动态数组, 只是LinkedList 的底层实现方式与 ArrayList底层的实现方式不一样.** 
+
+  - LinkedList 底层是使用 链表实现的动态数组, 且 LinkedList 是一个双向链表
+  - ArrayList 底层是使用普通数组实现的动态数组
+  - LinkedList实现的API与ArrayList 类似
+
+  > 因为ArrayList底层是采用数组实现的, 因此元素内存地址是连续的.
+  >
+  > 而LinkedList底层是采用链表实现的, 因此元素的地址是离线的不连续的. 
+
+  
+
+  
+
+- **LinkedList 实现原理**
+
+  ![](images/lklist.jpg)
+
+  LinkedList 为什么要使用双向链表来实现, 不是用单项链表来实现, 就是为了实现查找速度更快
+
+  从前往后找, 从后往前找  
+
+### 2、LinkedList 与 ArrayList 对比
+
+- **查找元素方面**
+  - ArrayList 查找元素的效率比LinkedList 高很多, LinkedList 要一个个的找效率低
+- **增加元素方面**
+  - 往尾部插入添加一个元素, ArrayList和LinkedList 的效率都很高
+  - 如果从前面往后面插入的元素LinkedList效率高, ArrayList效率很低
+  - 平均来说(任意位置) LinkedList和ArrayList 效率差不多, 都要操作差不多一半的元素
+- **删除元素方面**
+  - 删除尾部元素ArrayList 和 LinkedList 的效率差不多(都比较高)
+  - 删除头部元素LinkedList效率比较高, ArrayList的效率特别低
+  - 平均来说(任意位置) 两个的效率都差不多
+
+- **内存方面**
+  - LinkedList会频繁申请和销毁内存, 但是不会浪费内存
+  - ArrayList不会频繁的申请销毁内存, 可能存在浪费内存空间的极大浪费(特别是元素量特别大)
+    - 但是ArrayList可以使用缩容操作优化
+
+
+
+>  ArrayList 的优势:
+>
+> `查找元素, 删除尾部元素, 添加尾部元素`
+>
+> LinkedList的优势:
+>
+> `往尾部添加元素, 往头部添加元素, 删除尾部元素, 删除头部元素` 
+
+
+
+结论:
+
+经常查找元素选ArrayList, 经常收尾操作LinkedList 
+
+
+
+
+
+## 8、Stack 栈
+
+### 1、Stack (栈 数据结构) 介绍
+
+前面我们介绍的 ArrayList 和 LinkedList 都是有顺序的, 我们现在介绍的栈 Stack 只能在一端进行数据操作
+
+- Stack 翻译为 栈, 只能在一端进行数据操作
+
+  - 往栈中添加元素的操作, 一般称作 push (往栈定添加元素)
+  - 网栈中移除元素的操作, 一般称作 pop (只能移除栈顶的元素, 也叫弹出栈)
+  - Stack 栈, 有个特点 先进后出 (Last In First Out)
+
+  ![](images/stack.jpg) 
+
+> 注意:
+>
+> 我们这里介绍的栈Stack, 和内存中的 "栈空间"  是两个不空的概念, 这里说的栈Stack 是一种数据结构
+
+在我们java开发中, 如果要使用栈Stack 这种数据结构的话, 不用我们再实现了, 在JDK中已经帮我们实现了
+
+
+
+### 2、Stack 应用
+
+- 常用方法
+
+  ```
+  public
+  class Stack<E> extends Vector<E> {
+       
+      public E push(E item);	// 入栈
+      public E pop();		// 出栈
+      public E peek();	// 偷偷看一眼的意思 (返回栈顶元素)
+      public boolean empty();	// 判断当前栈是不是空的
+      public synchronized int search(Object o) ;	// 返回元素的索引, 从1开始递增,栈顶为1
+       int size();
+  }
+  ```
+
+- 示例
+
+  ```
+  public static void main(String[] args) { 
+  		  
+    Stack<Integer> stack = new Stack<>();
+  
+    stack.push(10);
+    stack.push(20);
+    stack.push(30);
+    stack.push(40);
+  
+    System.out.println(stack.peek());
+    System.out.println(stack.search(20));
+    System.out.println(stack.size());
+    System.out.println("----------");
+    while(!stack.empty()) {
+      System.out.println(stack.pop());
+    }
+  }	
+  // 打印:
+  40
+  3
+  4
+  ----------
+  40
+  30
+  20
+  10
+  ```
+
+  
+
+## 9、Queue 队列
+
+- Queue , 翻译为队列, 只能在头尾两段进行操作
+
+  - 队尾(rear): 只能从队尾添加元素, 一般叫做 入队
+  - 对头(font): 只能从对头移除元素, 一般叫做 出队
+  - 遵循先进先出原则, First In First Out, FIFO
+
+  ![](images/queue.jpg) 
+
+- 常用方法
+
+  ```
+  public interface Queue<E> extends Collection<E> {
+      boolean add(E e);		// 入队
+      boolean offer(E e);	// 入队
+      E remove();		// 出队
+      E poll();			// 出队
+      E element();	// 返回对头
+      E peek();			// 返回对头
+      boolean isEmpty();
+      int size();
+  }
+  ```
+
+> 注意:
+>
+> 我们在使用Stack 时, 是可以直接new 一个Stack的, 但是 Queue是接口不能直接 new.
+>
+> 在java开发中, Queue定义在 `java.util.Queue` 中是个接口, 它的通常实现时**LinkedList**
+
+- 示例:
+
+  ```
+  public static void main(String[] args) { 
+  		 
+    Queue<Integer> queue = new LinkedList<>();
+    queue.add(11);
+    queue.add(22);
+    queue.add(30);
+  
+    System.out.println(queue.element());
+  
+    while(!queue.isEmpty()) {
+      System.out.println(queue.poll());
+    }
+  }
+  // 打印:
+  11
+  11
+  22
+  30
+  ```
+
+  
+
+## 10、HashSet
+
+### 1 、HashSet 介绍
+
+- HashSet 实现了 Set 接口
+
+- List 与 Set 与 Map 的区别
+
+  - List的特点
+    - 可以存储重复的元素
+    - 可以通过索引访问元素
+  - Set 的特点
+    - 不可以存储重复的元素
+    - 不可以通过索引访问元素
+
+  - Map 的特点
+    - 不可以存储重复的key, 可以存储重复的value
+    - 不可以通过索引访问 key-value
+  - Set的底层是基于Map 实现的
+    - HashSet底层用了 HashMap
+    - LinkedHashSet 底层用了LinkedHashMap
+    - TreeSet  底层用了TreeMap
+
+- 示例:
+
+  ```
+  public static void main(String[] args) { 
+  		 
+  		Set<String> set = new HashSet<>();
+  		set.add("zhangsan");
+  		set.add("lisi");
+  		set.add("网二");
+  		set.add("zhangsan");
+  		System.out.println(set);
+  	}
+  // 打印:
+  [lisi, 网二, zhangsan] , 结果是无序的
+  ```
+
+  >  哈希值 与 添加顺序, 决定了set的打印顺序
+
+### 2、HashSet 的应用
+
+- 根据HashSet的特定, 可以用来做去重处理
+
+- 因为Set是没有顺序的, 所以我们不能使用普通的for循环来遍历, 但是我们可以使用Iterator 来遍历
+
+  **因为不管是List接口还是Set接口最终都是继承自Iterable 接口的, 所以我们可以使用Iterator来遍历我们的Set又因为for each 的底层实现其实就是使用的 Iterator, 所以也可以使用for each 来遍历**
+
+  > 换句话说, 我们不能通过索引来遍历Set, 其它的都可以
+  >
+  > 虽然我们可以通过Iterator 的方式来遍历Set, 但是它的顺序依然是不确定的
+
+- Set 的遍历示例
+
+  ```
+  public static void main(String[] args) { 
+    Set<String> set = new HashSet<>();
+    set.add("zhangsan");
+    set.add("lisi");
+    set.add("网二");
+    set.add("zhangsan");
+    for(String str: set) {
+      System.out.println(str);
+    }
+    System.out.println("----------");
+    Iterator<String> it = set.iterator();
+    while(it.hasNext()) {
+      System.out.println(it.next());
+    }
+    System.out.println("----------");
+    set.forEach((Item)->{ System.out.println(Item);});
+  }
+  
+  // 打印:
+  lisi
+  网二
+  zhangsan
+  ----------
+  lisi
+  网二
+  zhangsan
+  ----------
+  lisi
+  网二
+  zhangsan
+  ```
+
+  
+
+## 11、LinkedHashSet
+
+- LinkedHashSet 在HashSet 的基础上, 记录了元素的添加顺序. 
+
+  > 换句话说, 如果你要求元素去重, 还要记录元素的添加顺序, 使用LinkedHashSet 即可
+
+  ```
+  public static void main(String[] args) { 
+  
+    Set<String> set = new LinkedHashSet<>();
+    set.add("zhangsan");
+    set.add("lisi");
+    set.add("网二");
+    set.add("zhangsan");
+    for(String str: set) {
+      System.out.println(str);
+    }
+    System.out.println("----------");
+    Iterator<String> it = set.iterator();
+    while(it.hasNext()) {
+      System.out.println(it.next());
+    }
+    System.out.println("----------");
+    set.forEach((Item)->{ System.out.println(Item);});
+  }
+  // 打印结果, 和添加顺序完全一致
+  zhangsan
+  lisi
+  网二
+  ----------
+  zhangsan
+  lisi
+  网二
+  ----------
+  zhangsan
+  lisi
+  网二
+  ```
+
+## 12、TreeSet
+
+- TreeSet要求**元素必须具备可比较性**, 默认按照从小到大的顺序遍历元素
+
+  > 换句话说, 如果你想要元素去重, 又想元素取出来有顺序, 就使用TreeSet
+
+  ```
+  public static void main(String[] args) { 
+  
+    Set<String> set = new TreeSet<String>();
+    set.add("Z");
+    set.add("C");
+    set.add("E");
+    set.add("B");
+    set.add("");
+    for(String str: set) {
+      System.out.println(str);
+    }
+    System.out.println("----------");
+    Iterator<String> it = set.iterator();
+    while(it.hasNext()) {
+      System.out.println(it.next());
+    }
+    System.out.println("----------");
+    set.forEach((Item)->{ System.out.println(Item);});
+  }
+  
+  // 打印:
+  
+  B
+  C
+  E
+  Z
+  ----------
+  
+  B
+  C
+  E
+  Z
+  ----------
+  
+  B
+  C
+  E
+  Z
+  // 从上面的打印结果我们发现, 打印是有顺序的
+  ```
+
+- 上面介绍的TreeSet 是使用默认的比较器, 默认情况下是按照从小到大的顺序排列的, 但是有时我们不想使用JDK自带的比较器, 我们要怎么做呢? 
+
+  其实, 我们在使用TreeSet时还可以自己传递一个比较器Comparator 给TreeSet, 这样TreeSet在存储元素时, 在遍历元素时就会使用我们的比较器来实现比较规则, 示例如下
+
+  ```
+  // TreeSet 自定义比较器
+  Set<String> set = new TreeSet<String>(new Comparator<String>() {
+      @Override
+      public int compare(String o1, String o2) {
+        return - (o1.compareTo(o2)); 
+      } 
+    });
+    set.add("Z");
+    set.add("C");
+    set.add("E");
+    set.add("B");
+    set.add("");
+    for(String str: set) {
+      System.out.println(str);
+    }
+    System.out.println("----------");
+    Iterator<String> it = set.iterator();
+    while(it.hasNext()) {
+      System.out.println(it.next());
+    }
+    System.out.println("----------");
+    set.forEach((Item)->{ System.out.println(Item);});
+  }
+  
+  // 打印结果:
+  Z
+  E
+  C
+  B
+  
+  ----------
+  Z
+  E
+  C
+  B
+  
+  ----------
+  Z
+  E
+  C
+  B
+  ```
+
+  
+
+## 13、HashMap
+
+- HashMap 存储的是键值对(key-value), 有些编程语言中叫做 "字典"
+
+  ```
+  public static void main(String[] args) { 
+  	
+    Map<String, Integer> map = new HashMap<String, Integer>();
+  
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    System.out.println(map.size());
+    System.out.println(map.get("jack")); 
+    System.out.println(map);
+    System.out.println(map.remove("jack"));
+    System.out.println(map);
+  }
+  // 打印;
+  4
+  12
+  {kate=32, rose=12, jack=12, jim=33}
+  12
+  {kate=32, rose=12, jim=33}
+  ```
+
+  > 从打印结果我们发现, Map 的打印仍然和添加顺序无关, 与哈希值有关
+
+- HashMap 的遍历
+
+  - 方式1
+
+    ```
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    
+    Set<String> set = map.keySet();
+    for(String key: set) {
+      System.out.println(key + " " + map.get(key));
+    }
+    // 打印:
+    kate 32
+    rose 12
+    jack 12
+    jim 33
+    ```
+
+  - **方式2: 推荐**
+
+    ```
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    		
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    
+    Set<Entry<String, Integer>> entrySet = map.entrySet();
+    // 一个Entry 就是一个 key- value
+    for(Entry entry : entrySet) {
+      System.out.println(entry);
+    }
+    // 打印:
+    kate=32
+    rose=12
+    jack=12
+    jim=33
+    ```
+
+  - 方式3: 推荐
+
+    ```
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    
+    map.forEach(new BiConsumer<String, Integer>() {
+      @Override
+      public void accept(String key, Integer value) {
+        System.out.format("key: %s, value: %d \n",key, value );
+      }
+    });
+    // 打印:
+    key: kate, value: 32 
+    key: rose, value: 12 
+    key: jack, value: 12 
+    key: jim, value: 33 
+    
+    // 使用 lambda 表达式简化
+    map.forEach((String key, Integer value) -> {
+      System.out.format("key: %s, value: %d \n",key, value );
+    });
+    ```
+
+  - 只遍历key
+
+    ```
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    	 
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    
+    Set<String> keyset =	map.keySet();
+    for (String key : keyset) {
+      System.out.println(key);
+    }
+    ```
+
+  - 只遍历value
+
+    ```
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("jack", 12);
+    map.put("rose", 12);
+    map.put("jim", 33);
+    map.put("jack", 12);
+    map.put("kate", 32); 
+    Collection<Integer> collection =  map.values();
+    for (Integer value : collection) {
+      System.out.println(value);
+    }
+    // 打印:
+    32
+    12
+    12
+    33
+    ```
+
+    
+
+## 14、LinkedHashMap
+
+- LinkedHashMap 相对于 HashMap 来说, 与 LindedHashSet 相对于 HashSet 来说, 特点都差不多. 多了个顺序
+
+- LinkedHashMap 相对于 HashMap来说, 在HashMap的基础上记录了元素的添加顺序
+
+  ```
+  // HashMap
+  Map<String, Integer> map = new HashMap<String, Integer>();
+  map.put("jack", 11);
+  map.put("Rose", 22);
+  map.put("JIim", 33);
+  map.put("Kate", 44);
+  System.out.println(map);
+  // 打印:
+  {JIim=33, Kate=44, Rose=22, jack=11}
+  
+  // linkedHashMap
+  Map<String, Integer> map = new LinkedHashMap<String, Integer>();
+  map.put("jack", 11);
+  map.put("Rose", 22);
+  map.put("JIim", 33);
+  map.put("Kate", 44);
+  System.out.println(map);
+  // 打印:
+  {jack=11, Rose=22, JIim=33, Kate=44}
+  ```
+
+
+
+## 15、TreeMap
+
+- TreeMap 要求key必须具备可比较性, 默认按照从小到大排序
+
+  其实TreeMap 对于HashMap 与 TreeSet 对于 HashSet 的道理一样 , 就是增加的排序
+
+  ```
+  public static void main(String[] args) { 
+  
+    Map<String, Integer> map = new TreeMap<String, Integer>(); 
+    map.put("jack", 11);
+    map.put("Rose", 22);
+    map.put("JIim", 33);
+    map.put("Kate", 44);
+    System.out.println(map); 
+  }
+  // 打印:
+  {JIim=33, Kate=44, Rose=22, jack=11}
+  ```
+
+- 同TreeSet 一样, 在创建一个TreeMap 时, 我们也可以提供一个比较器, 自己来排序, 如下:
+
+  ```
+  public static void main(String[] args) { 
+    Map<String, Integer> map = new TreeMap<String, Integer>(new Comparator<String>() {
+      @Override
+      public int compare(String key1, String key2) { 
+        return - key1.compareTo(key2);
+      }
+    });
+    map.put("jack", 11);
+    map.put("Rose", 22);
+    map.put("JIim", 33);
+    map.put("Kate", 44);
+    System.out.println(map); 
+  }
+  // 打印: 可以发现是反序
+  {jack=11, Rose=22, Kate=44, JIim=33}
+  ```
+
+  
+
+
+
+**总结:**
+
+1. 其实Set 的底层实现都是基于Map 实现的
+2. HashSet 底层基于HashMap 实现, HashMap 底层使用的是红黑树, 链表, 哈希表
+3. LinkedHashSet  底层基于 LinkedHashMap 实现
+4. TreeSet 底层基于TreeMap 实现
+
+**Set 与 Map 的共同特点:**
+
+1. Set: 元素不重复, 元素不可以通过索引获取
+
+2. Map: key 不能重复, key不可以通过索引获取
+
+```
+public class HashSet<E> extends AbstractSet<E>implements Set<E>, Cloneable, java.io.Serializable{
+  public HashSet() {
+      map = new HashMap<>();
+  }
+  public boolean add(E e) {
+      return map.put(e, PRESENT)==null;
+  }
+}
+```
+
+
 
